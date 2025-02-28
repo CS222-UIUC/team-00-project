@@ -1,0 +1,2 @@
+I did a basic ORC model with pytorch and tesseract. With four experiments - basic, complicated, truncated complicated (number only), math formula.
+Conclusion is it only worked perfect for basic characters. It work partly for math formula and failed for the other two. We need beter preprocessing and additional customized recognition model for irregular texts. We may also consider recognize the huge photo by parts. 
