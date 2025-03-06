@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>For Nerds</title>
+</head>
+<body>
+    <h1>Server Data</h1>
+    <p>Running Time: {{ running_time }}</p>
+    <h2>Users</h2>
+    <ul>
+        {% for user in user_data %}
+            <li>Account: {{ user.account }}, Password: {{ user.password }}</li>
+        {% endfor %}
+    </ul>
+    <form method="post" action="{% url 'clear_database' %}">
+        {% csrf_token %}
+        <button type="submit">Clear Database</button>
+    </form>
+    <br><br>
+    <a href="{% url 'root' %}">Back to Main Page</a>
+</body>
+</html>
