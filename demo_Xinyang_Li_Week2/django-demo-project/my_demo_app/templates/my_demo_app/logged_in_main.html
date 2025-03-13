@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Main Page - Logged In</title>
+    <style>
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% load static %}
+    <h1>Welcome, {{ username }}!</h1>
+    <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ form.name.value }}" placeholder="Enter your name">
+        <label for="text_data">Your Text:</label>
+        <textarea id="editor" name="text_data" rows="10" cols="50">{{ form.text_data.value }}</textarea>
+        <button type="submit">Save</button>
+    </form>
+
+    <script>
+        // Load the saved text from localStorage
+        document.getElementById('editor').value = localStorage.getItem('userText') || '';
+
+        // Save the text to localStorage on input
+        document.getElementById('editor').addEventListener('input', function() {
+            localStorage.setItem('userText', this.value);
+        });
+    </script>
+</body>
+</html>
