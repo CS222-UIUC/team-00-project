@@ -7,10 +7,7 @@
     <h1>Register</h1>
     <form method="post" action="{% url 'register' %}">
         {% csrf_token %}
-        <label for="account">Account:</label>
-        <input type="text" id="account" name="account" required><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
+        {{ form.as_p }}
         <button type="submit">Register</button>
     </form>
     <br><br>

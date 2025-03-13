@@ -1,4 +1,5 @@
 from django.contrib import admin
-from .models import User
+from .models import LoggedInUser, UserTextData
 
-admin.site.register(User)
+admin.site.register(LoggedInUser)
+admin.site.register(UserTextData)

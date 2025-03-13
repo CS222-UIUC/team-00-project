@@ -1,13 +1,13 @@
 from django.urls import path
-from .views import demo_view, root_view, register_view, login_view, nerds_view, oauth_success_view, forgot_password_view
+from . import views
 
 urlpatterns = [
-    path('demo/', demo_view, name='demo'),
-    path('', root_view, name='root'),
-    path('register/', register_view, name='register'),
-    path('login/', login_view, name='login'),
-    path('nerds/', nerds_view, name='nerds'),
-    path('oauth-success/', oauth_success_view, name='oauth_success'),
-    path('forgot-password/', forgot_password_view, name='forgot_password'),
-    path('clear-database/', nerds_view, name='clear_database'),
+    path('', views.root_view, name='root'),
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('forgot_password/', views.forgot_password_view, name='forgot_password'),
+    path('demo/', views.demo_view, name='demo'),
+    path('oauth_success/', views.oauth_success_view, name='oauth_success'),
+    path('logged_in/', views.logged_in_view, name='logged_in'),
+    path('logout/', views.logout_view, name='logout'),
 ]

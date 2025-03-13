@@ -3,9 +3,6 @@
 <head>
     <title>Main Page</title>
     <style>
-        #nerds-button {
-            display: none;
-        }
         .upside-down {
             transform: rotate(180deg);
         }
@@ -13,40 +10,35 @@
 </head>
 <body>
     {% load static %}
-    <h1>Welcome to CS222 Week 2 demo</h1>
+    <h1>Welcome to LaTex converter</h1>
     <a href="{% url 'login' %}">Login</a>
     <a href="{% url 'register' %}">Register</a>
     <h2>Login with OAuth</h2>
     <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
     <br><br>
-    <img id="secret-image" src="https://myhotposters.com/cdn/shop/products/mQ0373_a6997410-8d0e-4996-95e0-552e9e5f8a37_1024x1024.jpg?v=1571444624" alt="Secret Image" style="width:200px;height:auto;">
+    <img id="secret-image" src="https://artprojectsforkids.org/wp-content/uploads/2024/01/Draw-Baby-Yoda-web.jpg" alt="Secret Image" style="width:200px;height:auto;">
     <br><br>
-    <a id="nerds-button" href="{% url 'nerds' %}">For Nerds</a>
+    <a href="/admin/">Admin</a>
 
     <audio id="bang-sound" src="{% static 'my_demo_app/smb_stage_clear.wav' %}"></audio>
 
     <script>
         let clickCount = 0;
         const image = document.getElementById('secret-image');
-        const nerdsButton = document.getElementById('nerds-button');
         const bangSound = document.getElementById('bang-sound');
 
         image.addEventListener('click', () => {
             clickCount++;
             if (clickCount >= 10) {
-                nerdsButton.style.display = 'inline';
                 image.classList.add('upside-down');
                 bangSound.play();
             }
         });
-
-        </script>
-    
-        {% if message %}
-        <script>
-            alert("{{ message }}");
-        </script>
-        {% endif %}
     </script>
+    {% if message %}
+    <script>
+        alert("{{ message }}");
+    </script>
+    {% endif %}
 </body>
 </html>
