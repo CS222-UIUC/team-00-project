@@ -1,0 +1,14 @@
+extends ../layout-marketing
+
+block vars
+	- bootstrap5PageStatus = 'enabled'
+
+block entrypointVar
+	- entrypoint = 'pages/user/subscription/preview-change'
+
+block append meta
+	meta(name="ol-subscriptionChangePreview" data-type="json" content=changePreview)
+
+block content
+	main.content.content-alt#main-content
+		#subscription-preview-change
