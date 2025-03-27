@@ -1,0 +1,370 @@
+// TODO: .website-redesign to be removed once fully rolled out
+
+@mixin reset-font-size($size) {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  ul,
+  ol {
+    @if $size == 'heading-2xl' {
+      @include heading-2xl;
+    } @else if $size == 'heading-xl' {
+      @include heading-xl;
+    } @else if $size == 'heading-lg' {
+      @include heading-lg;
+    } @else if $size == 'heading-md' {
+      @include heading-md;
+    } @else if $size == 'heading-sm' {
+      @include heading-sm;
+    } @else if $size == 'heading-xs' {
+      @include heading-xs;
+    } @else if $size == 'base' {
+      @include body-base;
+    }
+  }
+}
+
+.website-redesign {
+  &:not(.application-page) {
+    --link-color: var(--link-web);
+    --link-hover-color: var(--link-web-hover);
+    --link-visited-color: var(--link-web-visited);
+    --link-hover-text-decoration: underline;
+
+    .notification {
+      --link-color: var(--link-ui);
+      --link-hover-color: var(--link-ui-hover);
+      --link-visited-color: var(--link-ui-visited);
+    }
+  }
+
+  // hero section of features, enterprises, and universities will have an image that will overflow the page
+
+  --bs-body-color: var(--neutral-70);
+
+  overflow-x: hidden;
+
+  a {
+    &:focus,
+    &:focus-visible {
+      outline: 0;
+    }
+
+    &:focus-visible {
+      @include box-shadow-button-input;
+    }
+
+    i {
+      vertical-align: middle;
+      margin-left: var(--spacing-02);
+      padding-bottom: 3px;
+    }
+
+    &.link-lg {
+      font-size: var(--font-size-04);
+      line-height: var(--line-height-03);
+
+      i {
+        font-size: 24px;
+        line-height: inherit;
+      }
+    }
+
+    &.link-xl {
+      font-size: var(--font-size-06);
+      line-height: var(--line-height-05);
+
+      i {
+        font-size: var(--font-size-06);
+        line-height: var(--font-size-06);
+      }
+    }
+
+    // Specific overrides for link styles
+    &.link-monospace {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    &.btn:hover {
+      text-decoration: none;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+  }
+
+  h1,
+  .h1 {
+    @include heading-2xl;
+  }
+
+  .font-size-h1 {
+    @include reset-font-size('heading-2xl');
+  }
+
+  h2,
+  .h2 {
+    @include heading-xl;
+  }
+
+  .font-size-h2 {
+    @include reset-font-size('heading-xl');
+  }
+
+  h3,
+  .h3 {
+    @include heading-lg;
+  }
+
+  .font-size-h3 {
+    @include reset-font-size('heading-lg');
+  }
+
+  h4,
+  .h4 {
+    @include heading-md;
+  }
+
+  .font-size-h4 {
+    @include reset-font-size('heading-md');
+  }
+
+  h5,
+  .h5 {
+    @include heading-sm;
+  }
+
+  .font-size-h5 {
+    @include reset-font-size('heading-sm');
+  }
+
+  h6,
+  .h6 {
+    @include heading-xs;
+  }
+
+  .font-size-h6 {
+    @include reset-font-size('heading-xs');
+  }
+
+  .font-size-base {
+    @include reset-font-size('base');
+  }
+
+  // smaller fonts for mobile
+  @include media-breakpoint-down(lg) {
+    h1,
+    .h1 {
+      @include heading-xl;
+    }
+
+    .font-size-h1 {
+      @include reset-font-size('heading-xl');
+    }
+
+    h2,
+    .h2 {
+      @include heading-lg;
+    }
+
+    .font-size-h2 {
+      @include reset-font-size('heading-lg');
+    }
+
+    h3,
+    .h3 {
+      @include heading-md;
+    }
+
+    .font-size-h3 {
+      @include reset-font-size('heading-md');
+    }
+
+    h4,
+    .h4 {
+      @include heading-sm;
+    }
+
+    .font-size-h4 {
+      @include reset-font-size('heading-sm');
+    }
+
+    h5,
+    .h5 {
+      @include heading-xs;
+    }
+
+    .font-size-h5 {
+      @include reset-font-size('heading-xs');
+    }
+
+    h6,
+    .h6 {
+      @include body-base;
+    }
+
+    .font-size-h6 {
+      @include reset-font-size('base');
+    }
+  }
+
+  .font-size-display-xs {
+    @include display-xs;
+  }
+
+  .text-purple-bright {
+    color: var(--purple-bright);
+  }
+
+  .text-green-bright {
+    color: var(--green-bright);
+  }
+
+  .card {
+    --bs-card-bg: var(--neutral-10);
+    --bs-card-border-radius: var(--border-radius-large);
+
+    &.page-content-card {
+      --bs-card-bg: transparent;
+    }
+  }
+
+  .badge-premium {
+    --badge-font-weight: 600;
+  }
+
+  .content-alt {
+    background-color: var(--bg-light-primary);
+  }
+
+  .page-header {
+    border-bottom-width: 0;
+  }
+
+  .round-background {
+    border-radius: 50%;
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+  }
+
+  .green-round-background {
+    @extend .round-background;
+
+    background: var(--green-30);
+  }
+
+  .features-card {
+    display: flex; /* equal heights */
+    flex-wrap: wrap;
+    align-items: center;
+
+    .features-card-media,
+    .features-card-media-right {
+      padding-top: var(--spacing-08);
+      position: relative;
+
+      img.img-responsive {
+        width: 100%;
+      }
+
+      video {
+        box-shadow:
+          0 4px 6px 0 rgb(30 37 48 / 12%),
+          0 8px 16px 0 rgb(30 37 48 / 12%);
+        max-height: 100%;
+        width: auto;
+        width: 100%;
+      }
+
+      @include media-breakpoint-down(lg) {
+        margin-bottom: var(--spacing-11);
+      }
+    }
+
+    @include media-breakpoint-up(lg) {
+      .features-card-media-right {
+        padding-left: var(--spacing-13);
+      }
+
+      .features-card-media {
+        padding-right: var(--spacing-13);
+      }
+    }
+
+    .features-card-description,
+    .features-card-description-list {
+      padding-top: var(--spacing-06);
+
+      p {
+        margin-bottom: var(--spacing-06);
+        font-size: 1.125rem;
+        line-height: 1.333;
+
+        @include media-breakpoint-down(lg) {
+          font-size: 1rem;
+          line-height: 1.375;
+        }
+      }
+    }
+
+    .features-card-description {
+      h3 {
+        font-size: 1.5rem;
+        line-height: 1.4;
+        margin-bottom: var(--spacing-04);
+      }
+    }
+
+    .features-card-description-list {
+      h3 {
+        font-size: 1.875rem;
+        line-height: 1.5;
+      }
+
+      ul.list-simple-text,
+      ul.list-heading-text {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          margin-bottom: var(--spacing-05);
+          font-size: 1.125rem;
+          line-height: 1.333;
+          display: flex;
+
+          @include media-breakpoint-down(lg) {
+            font-size: 1rem;
+            line-height: 1.375;
+          }
+        }
+      }
+
+      ul.list-heading-text {
+        li {
+          h4 {
+            margin-top: 0;
+            margin-bottom: var(--spacing-04);
+            font-size: 20px;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+extends ../layout-marketing
+
+block vars
+	- var suppressNavbar = true
+	- var suppressFooter = true
+	- var suppressSkipToContent = true
+	- var suppressCookieBanner = true
+	- bootstrap5PageStatus = 'disabled'
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-6.col-md-offset-3
+					.card
+						p.text-center #{translate('processing_your_request')}
+
+	form(
+		data-ol-regular-form
+		data-ol-auto-submit
+		method="POST"
+	)
+		input(name="_csrf" type="hidden" value=csrfToken)
+		input(hidden name="viaGateway" type="submit" value="true")
+		for name in Object.keys(form_data)
+			input(name=name type="hidden" value=form_data[name])

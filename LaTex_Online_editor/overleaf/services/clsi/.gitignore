@@ -1,0 +1,14 @@
+**.swp
+node_modules
+test/acceptance/fixtures/tmp
+compiles
+output
+.DS_Store
+*~
+cache
+.vagrant
+config/*
+npm-debug.log
+
+# managed by dev-environment$ bin/update_build_scripts
+.npmrc

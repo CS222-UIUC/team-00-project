@@ -1,0 +1,18 @@
+extends ../layout-marketing
+
+block vars
+	- bootstrap5PageStatus = 'enabled' // Enforce BS5 version
+
+block entrypointVar
+	- entrypoint = 'pages/user/subscription/group-management/add-seats'
+
+block append meta
+	meta(name="ol-subscriptionData" data-type="json" content=subscriptionData)
+	meta(name="ol-groupName", data-type="string", content=groupName)
+	meta(name="ol-subscriptionId", data-type="string", content=subscriptionId)
+	meta(name="ol-totalLicenses", data-type="number", content=totalLicenses)
+	meta(name="ol-isProfessional", data-type="boolean", content=isProfessional)
+
+block content
+	main.content.content-alt#main-content
+		#add-seats-root

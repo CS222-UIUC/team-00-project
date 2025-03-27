@@ -1,0 +1,91 @@
+mixin formMessages()
+	div(
+		data-ol-form-messages='',
+		role="alert"
+	)
+
+mixin formMessagesNewStyle()
+	div(
+		data-ol-form-messages-new-style='',
+		role="alert"
+	)
+
+mixin customFormMessage(key, kind)
+	if kind === 'success'
+		div.alert.alert-success(
+			hidden,
+			data-ol-custom-form-message=key,
+			role="alert"
+			aria-live="polite"
+		)
+			block
+	else if kind === 'danger'
+		div.alert.alert-danger(
+			hidden,
+			data-ol-custom-form-message=key,
+			role="alert"
+			aria-live="assertive"
+		)
+			block
+	else
+		div.alert.alert-warning(
+			hidden,
+			data-ol-custom-form-message=key,
+			role="alert"
+			aria-live="polite"
+		)
+			block
+
+mixin customFormMessageNewStyle(key, kind)
+	if kind === 'success'
+		div.notification.notification-type-success(
+				hidden,
+				data-ol-custom-form-message=key,
+				role="alert"
+				aria-live="polite"
+			)
+			div.notification-icon
+				span.material-symbols(aria-hidden="true") check_circle
+			div.notification-content.text-left
+				block
+	else if kind === 'danger'
+		div.notification.notification-type-error(
+			hidden,
+			data-ol-custom-form-message=key,
+			role="alert"
+			aria-live="polite"
+		)
+			div.notification-icon
+				span.material-symbols(aria-hidden="true") error
+			div.notification-content.text-left
+				block
+	else
+		div.notification.notification-type-warning(
+				hidden,
+				data-ol-custom-form-message=key,
+				role="alert"
+				aria-live="polite"
+			)
+			div.notification-icon
+				span.material-symbols(aria-hidden="true") warning
+			div.notification-content.text-left
+				block
+
+mixin customValidationMessage(key)
+	div.invalid-feedback.mt-2(
+		hidden,
+		data-ol-custom-form-message=key
+	)
+		i.fa.fa-fw.fa-warning.me-1(aria-hidden="true")
+		div
+			block
+
+mixin customValidationMessageNewStyle(key)
+	div.notification.notification-type-error(
+			hidden,
+			data-ol-custom-form-message=key
+		)
+		div.notification-icon
+			span.material-symbols(aria-hidden="true") error
+		div.notification-content.text-left.small
+			block
