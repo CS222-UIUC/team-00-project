@@ -14,36 +14,47 @@ User = get_user_model()
 
 start_time = datetime.datetime.now()
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def root_view(request):
     if LoggedInUser.objects.exists():
         logged_in_user = LoggedInUser.objects.first()
-        return render(request, 'my_demo_app/logged_in_main.html', {'username': logged_in_user.user.username})
+        return render(
+            request,
+            "my_demo_app/logged_in_main.html",
+            {"username": logged_in_user.user.username},
+        )
     else:
-        message = request.GET.get('message', None)
-        return render(request, 'my_demo_app/index.html', {'message': message})
+        message = request.GET.get("message", None)
+        return render(request, "my_demo_app/index.html", {"message": message})
 
-@api_view(['GET', 'POST'])
+
+@api_view(["GET", "POST"])
 @permission_classes([AllowAny])
 def register_view(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect(f'/?message=Registration successful.')
+            return redirect(f"/?message=Registration successful.")
         else:
-            return render(request, 'my_demo_app/register.html', {'form': form, 'message': 'Registration failed.', 'status': 'error'})
+            return render(
+                request,
+                "my_demo_app/register.html",
+                {"form": form, "message": "Registration failed.", "status": "error"},
+            )
     else:
         form = UserCreationForm()
-    return render(request, 'my_demo_app/register.html', {'form': form})
+    return render(request, "my_demo_app/register.html", {"form": form})
 
-@api_view(['GET', 'POST'])
+
+@api_view(["GET", "POST"])
 @permission_classes([AllowAny])
 def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
         if user is not None:
             # Log out the currently logged-in user if there is one
@@ -57,33 +68,52 @@ def login_view(request):
             # Log in the new user and update the LoggedInUser model
             login(request, user)
             LoggedInUser.objects.create(user=user)
-            return redirect('/')
+            return redirect("/")
         else:
-            return render(request, 'my_demo_app/login.html', {'message': 'Invalid username or password.', 'status': 'error'})
-    return render(request, 'my_demo_app/login.html')
+            return render(
+                request,
+                "my_demo_app/login.html",
+                {"message": "Invalid username or password.", "status": "error"},
+            )
+    return render(request, "my_demo_app/login.html")
 
-@api_view(['GET', 'POST'])
+
+@api_view(["GET", "POST"])
 @permission_classes([AllowAny])
 def forgot_password_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
+    if request.method == "POST":
+        username = request.POST.get("username")
         try:
             user = User.objects.get(username=username)
             # Here you would typically send an email with a password reset link
-            return render(request, 'my_demo_app/forgot_password.html', {'message': 'Password reset instructions have been sent to your email.', 'status': 'success'})
+            return render(
+                request,
+                "my_demo_app/forgot_password.html",
+                {
+                    "message": "Password reset instructions have been sent to your email.",
+                    "status": "success",
+                },
+            )
         except User.DoesNotExist:
-            return render(request, 'my_demo_app/forgot_password.html', {'message': 'Account does not exist.', 'status': 'error'})
-    return render(request, 'my_demo_app/forgot_password.html')
+            return render(
+                request,
+                "my_demo_app/forgot_password.html",
+                {"message": "Account does not exist.", "status": "error"},
+            )
+    return render(request, "my_demo_app/forgot_password.html")
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def demo_view(request):
-    return JsonResponse({'message': 'Hello, world!'})
+    return JsonResponse({"message": "Hello, world!"})
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def oauth_success_view(request):
-    return redirect('/')
+    return redirect("/")
+
 
 @login_required
 def logged_in_view(request):
@@ -93,17 +123,22 @@ def logged_in_view(request):
     except UserTextData.DoesNotExist:
         user_text_data = None
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserTextDataForm(request.POST, instance=user_text_data)
         if form.is_valid():
             user_text_data = form.save(commit=False)
             user_text_data.user = user
             user_text_data.save()
-            return redirect('logged_in')
+            return redirect("logged_in")
     else:
         form = UserTextDataForm(instance=user_text_data)
 
-    return render(request, 'my_demo_app/logged_in_main.html', {'username': user.username, 'form': form})
+    return render(
+        request,
+        "my_demo_app/logged_in_main.html",
+        {"username": user.username, "form": form},
+    )
+
 
 @login_required
 def logout_view(request):
@@ -114,4 +149,4 @@ def logout_view(request):
     except LoggedInUser.DoesNotExist:
         pass
     logout(request)
-    return redirect('/')
+    return redirect("/")
