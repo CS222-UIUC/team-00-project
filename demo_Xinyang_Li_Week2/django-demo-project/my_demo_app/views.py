@@ -37,7 +37,7 @@ def register_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect(f"/?message=Registration successful.")
+            return redirect("/?message=Registration successful.")
         else:
             return render(
                 request,
@@ -84,7 +84,7 @@ def forgot_password_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
         try:
-            user = User.objects.get(username=username)
+            _ = User.objects.get(username=username)
             # Here you would typically send an email with a password reset link
             return render(
                 request,

@@ -1,4 +1,4 @@
-# filepath: e:\cs222\team-00-project\demo_Xinyang_Li_Week2\django-demo-project\my_demo_app\pipeline.py
+# Filepath: demo_Xinyang_Li_Week2/django-demo-project/my_demo_app/pipeline.py
 from social_core.exceptions import AuthAlreadyAssociated
 from django.contrib.auth import logout
 from .models import LoggedInUser
