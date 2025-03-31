@@ -11,16 +11,16 @@ ground_truths = {
     "formula3.png": "<math>A_{ij} = 1</math>",
     "formula4.png": (
         '<math display="block">'
-        '(\\mathbf{A} - \\sigma \\mathbf{I})^{-1} \\mathbf{x} = '
-        '\\frac{1}{\\lambda - \\sigma} \\mathbf{x}'
-        '</math>'
+        "(\\mathbf{A} - \\sigma \\mathbf{I})^{-1} \\mathbf{x} = "
+        "\\frac{1}{\\lambda - \\sigma} \\mathbf{x}"
+        "</math>"
     ),
     "formula5.png": (
         '<math display="block">'
-        '\\mathbf{x}_0 = \\alpha_1 \\mathbf{u}_1 + '
-        '\\alpha_2 \\mathbf{u}_2 + \\cdots + '
-        '\\alpha_n \\mathbf{u}_n'
-        '</math>'
+        "\\mathbf{x}_0 = \\alpha_1 \\mathbf{u}_1 + "
+        "\\alpha_2 \\mathbf{u}_2 + \\cdots + "
+        "\\alpha_n \\mathbf{u}_n"
+        "</math>"
     ),
     "formula6.png": "<math>\\det(\\mathbf{A} - \\lambda \\mathbb{I}) = 0</math>",
     "formula7.png": "<math>\\int x^n \\, dx = \\frac{x^{n+1}}{n+1} + C</math>",
@@ -35,7 +35,7 @@ def extract_math(text):
     Strip out the unwanted parts (the "text=" prefix and the "confidence=..." suffix)
     """
     if text.startswith("text="):
-        text = text[len("text="):].strip()
+        text = text[len("text=") :].strip()
     if "confidence=" in text:
         text = text.split("confidence=")[0].strip()
     if len(text) >= 2 and text[0] in ['"', "'"] and text[-1] in ['"', "'"]:
