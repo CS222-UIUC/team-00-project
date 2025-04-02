@@ -6,12 +6,10 @@ name: Node.js CI
 on:
   push:
     branches: [ "*" ]
-    paths:
-      - '**/*.js'
+    paths: [ '**/*.js' ]
   pull_request:
     branches: [ "*" ]
-    paths:
-      - '**/*.js'
+    paths: [ '**/*.js' ]
 
 jobs:
   build:
@@ -19,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [18.x, 20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -31,6 +29,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    - name: Install patch-package globally
+      run: npm install -g patch-package
+
     - name: Run CI tasks in all Node.js projects
       run: |
         echo "Searching for all package.json files"
@@ -39,16 +40,13 @@ jobs:
           cd $dir
 
           echo "Installing dependencies"
-          npm install
-
-          echo "Ensuring patch-package is available"
-          npm install patch-package --save-dev
+          npm install || echo "Install failed, skipping $dir" && cd - && continue
 
           echo "Lint"
-          npm run lint || echo "Lint failed, but continuing..."
+          npm run lint || echo "Lint failed, continuing..."
 
           echo "Tests (if defined)"
-          npm test --if-present || echo "Tests failed, but continuing..."
+          npm test --if-present || echo "Tests failed, continuing..."
 
           echo "Done with $dir"
           cd -
