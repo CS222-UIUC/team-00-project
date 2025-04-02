@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/CS222-UIUC/team-00-project/issues"
   },
-  "homepage": "https://github.com/CS222-UIUC/team-00-project#readme"
+  "homepage": "https://github.com/CS222-UIUC/team-00-project#readme",
+  "devDependencies": {
+    "patch-package": "^8.0.0"
+  }
 }
