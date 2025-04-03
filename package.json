@@ -1,0 +1,23 @@
+{
+  "name": "cs222project",
+  "version": "1.0.0",
+  "description": "Project Repo for Team 0 - Spring 2025",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CS222-UIUC/team-00-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CS222-UIUC/team-00-project/issues"
+  },
+  "homepage": "https://github.com/CS222-UIUC/team-00-project#readme",
+  "devDependencies": {
+    "patch-package": "^8.0.0"
+  }
+}

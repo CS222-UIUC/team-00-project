@@ -1,6 +1,14 @@
 name: Django CI
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - '**/*.py'
+      - 'requirements.txt'
+  pull_request:
+    paths:
+      - '**/*.py'
+      - 'requirements.txt'
 
 jobs:
   build:
@@ -28,5 +36,11 @@ jobs:
 
     - name: Run unit tests with coverage
       run: |
+        MANAGE_PATH=$(find . -type f -name "manage.py" | head -n 1)
+        if [ -z "$MANAGE_PATH" ]; then
+          echo "manage.py not found"
+          exit 1
+        fi
+        cd $(dirname "$MANAGE_PATH")
         coverage run manage.py test
         coverage report --fail-under=80
