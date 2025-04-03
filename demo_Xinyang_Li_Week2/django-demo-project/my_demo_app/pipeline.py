@@ -1,7 +1,8 @@
-# filepath: e:\cs222\team-00-project\demo_Xinyang_Li_Week2\django-demo-project\my_demo_app\pipeline.py
+# Filepath: demo_Xinyang_Li_Week2/django-demo-project/my_demo_app/pipeline.py
 from social_core.exceptions import AuthAlreadyAssociated
 from django.contrib.auth import logout
 from .models import LoggedInUser
+
 
 def social_user(backend, uid, user=None, *args, **kwargs):
     provider = backend.name
@@ -9,7 +10,7 @@ def social_user(backend, uid, user=None, *args, **kwargs):
 
     if social:
         if user and social.user != user:
-            msg = 'This account is already in use.'
+            msg = "This account is already in use."
             raise AuthAlreadyAssociated(backend, msg)
 
         if not user:
@@ -24,11 +25,11 @@ def social_user(backend, uid, user=None, *args, **kwargs):
             pass
 
         # Manually set the backend attribute on the user object
-        user.backend = f'social_core.backends.{provider}.{provider.capitalize()}OAuth2'
+        user.backend = f"social_core.backends.{provider}.{provider.capitalize()}OAuth2"
 
         # Log in the new user and update the LoggedInUser model
-        backend.strategy.session['_auth_user_id'] = user.pk
-        backend.strategy.session['_auth_user_backend'] = user.backend
+        backend.strategy.session["_auth_user_id"] = user.pk
+        backend.strategy.session["_auth_user_backend"] = user.backend
         LoggedInUser.objects.create(user=user)
 
-    return {'social': social, 'user': user}
+    return {"social": social, "user": user}

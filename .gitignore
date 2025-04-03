@@ -1,0 +1,38 @@
+# Python virtual environments
+venv/
+.env/
+
+# Compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# SQLite database
+db.sqlite3
+
+# Mac system files
+.DS_Store
+
+# Node.js dependencies
+node_modules/
+
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VS Code settings
+.vscode/
+
+# Patch-package patches
+patches/
+
+# coverage files
+coverage/
+*.cover
+*.log
+
+# static asset build folders
+dist/
+build/
