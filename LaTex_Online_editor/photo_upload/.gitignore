@@ -1,0 +1,16 @@
+# Ignore everything by default
+*
+# Allow specific files
+!backend/server.mjs
+!cookies.txt
+!eslint.config.mjs
+!index.html
+!package.json
+!server.js
+!requirements.txt
+!start_servers.sh
+!style.css
+!upload.js
+
+# Ignore .gitignore itself (optional, but usually not ignored)
+!.gitignore
