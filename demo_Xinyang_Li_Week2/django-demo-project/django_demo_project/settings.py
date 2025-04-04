@@ -123,7 +123,4 @@ LOGIN_URL = "login"
 LOGOUT_URL = "logout"
 LOGIN_REDIRECT_URL = "/"
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = (
-    "381159104647-3tmaoa40jh3e047kmgpifchkidemfb9h.apps.googleusercontent.com"
-)
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "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"
+

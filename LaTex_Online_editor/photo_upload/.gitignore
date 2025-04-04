@@ -11,6 +11,3 @@
 !start_servers.sh
 !style.css
 !upload.js
-
-# Ignore .gitignore itself (optional, but usually not ignored)
-!.gitignore

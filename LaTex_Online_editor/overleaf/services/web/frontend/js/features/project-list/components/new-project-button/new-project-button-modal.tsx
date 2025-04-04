@@ -5,7 +5,7 @@ import { JSXElementConstructor, lazy, Suspense, useCallback } from 'react'
 import { Nullable } from '../../../../../../types/utils'
 import { FullSizeLoadingSpinner } from '@/shared/components/loading-spinner'
 import { useLocation } from '@/shared/hooks/use-location'
-
+import CreateFromPhotoModal from './create-from-photo-modal'
 const UploadProjectModal = lazy(() => import('./upload-project-modal'))
 
 export type NewProjectButtonModalVariant =
@@ -13,6 +13,7 @@ export type NewProjectButtonModalVariant =
   | 'example_project'
   | 'upload_project'
   | 'import_from_github'
+  | 'create_from_photo'
 
 type NewProjectButtonModalProps = {
   modal: Nullable<NewProjectButtonModalVariant>
@@ -47,6 +48,8 @@ function NewProjectButtonModal({ modal, onHide }: NewProjectButtonModalProps) {
           <UploadProjectModal onHide={onHide} openProject={openProject} />
         </Suspense>
       )
+    case 'create_from_photo':
+        return <CreateFromPhotoModal onHide={onHide} />
     case 'import_from_github':
       return <ImportProjectFromGithubModalWrapper onHide={onHide} />
     default:

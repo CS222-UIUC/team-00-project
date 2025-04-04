@@ -3,8 +3,8 @@ services:
 
     sharelatex:
         restart: always
-        image: my-overleaf-web:custom
-        container_name: sharelatex
+        image: sharelatex/sharelatex:latex_editor_development
+        container_name: overleaf
         volumes:
             - "${OVERLEAF_DATA_PATH}:${OVERLEAF_IN_CONTAINER_DATA_PATH}"
         ports:
