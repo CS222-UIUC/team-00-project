@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Upload</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload a Photo</h1>
+        <form id="uploadForm">
+            <input type="file" id="photoInput" name="photo" accept="image/*" required />
+            <button type="submit">Upload</button>
+        </form>
+        
+        <img id="uploadedPhoto" style="display: none; max-width: 300px;" alt="Uploaded Photo" />
+        <a id="zipFileLink" style="display: none;" target="_blank">Download .zip file</a>
+        <div id="message"></div>
+    </div>
+    <script src="upload.js"></script>
+</body>
+</html>

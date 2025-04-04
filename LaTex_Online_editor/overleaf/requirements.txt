@@ -1,0 +1,11 @@
+express
+mongoose
+pug
+flask
+pymongo
+jinja2
+docker
+docker compose
+requests
+dotenv
+commander

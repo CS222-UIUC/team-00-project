@@ -1,0 +1,8 @@
+Flask==2.3.2                
+Flask-Cors==3.0.10          
+Werkzeug==2.3.2             
+Pillow==9.5.0               
+requests==2.31.0            
+python-dotenv==1.0.0        
+archiver==0.8.0             
+openai==0.27.8              
