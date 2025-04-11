@@ -4,11 +4,7 @@ from llama_cpp import Llama
 model_Janus = r"E:\cs222\Janus-Pro-7B-LM.Q6_K.gguf"  # local path
 model_deepseek_r1 = r"E:\cs222\DeepSeek-R1-q5_k_m.gguf"  # local path
 llm = Llama(
-    model_path=model_Janus,
-    n_ctx=16384,
-    n_threads=8,
-    n_gpu_layers=30,
-    verbose=False
+    model_path=model_Janus, n_ctx=16384, n_threads=8, n_gpu_layers=30, verbose=False
 )
 
 
@@ -178,6 +174,6 @@ def get_latex(user_input):
         top_k=40,
         top_p=0.9,
         repeat_penalty=1.15,
-        stop=["### User:", "### Assistant:"]
+        stop=["### User:", "### Assistant:"],
     )
     return clean_latex_output(output["choices"][0]["text"])
