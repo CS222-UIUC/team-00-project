@@ -30,9 +30,15 @@ patches/
 
 # coverage files
 coverage/
+.coverage
 *.cover
 *.log
 
 # static asset build folders
 dist/
 build/
+
+# Model/data output
+math_formulas/
+*.pdf
+*.tex
