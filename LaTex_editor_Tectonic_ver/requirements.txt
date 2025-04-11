@@ -1,0 +1,14 @@
+# Core Python dependencies
+Flask>=2.2.0
+Flask-Cors>=3.0.10
+Werkzeug>=2.2.0
+
+# Image processing
+Pillow>=9.0.0
+
+# OCR model (Surya)
+surya-ocr
+
+# Testing and coverage
+pytest>=8.0.0
+pytest-cov>=4.0.0
