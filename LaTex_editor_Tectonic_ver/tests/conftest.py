@@ -2,8 +2,9 @@ import os
 import sys
 import pytest
 
-sys.path.insert(0,  # noqa: E402
-                os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # noqa: E402
+)
 
 
 from backend.server import app
