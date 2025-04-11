@@ -1,0 +1,15 @@
+# Ignore everything in the LLM_MODEL directory
+*
+
+# Allow specific files
+!api_server.py
+!cli_latex.py
+!model.py
+!test_api_server.py
+!test_api.js
+!requirements.txt
+!readme.md
+!Model_playground.ipynb
+
+# Allow .gitignore itself
+!.gitignore
