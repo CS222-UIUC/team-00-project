@@ -1,6 +1,8 @@
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
+from backend.ocr import predictor
+from PIL import Image
 import uuid
 import os
 import subprocess
@@ -68,4 +70,6 @@ def ocr_image():
 
 
 if __name__ == "__main__":  # pragma: no cover
+    dummy = Image.new("RGB", (10, 10), color="white")
+    _ = predictor([dummy])
     app.run(host="0.0.0.0", port=5050, debug=True)

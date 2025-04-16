@@ -12,3 +12,4 @@ surya-ocr
 # Testing and coverage
 pytest>=8.0.0
 pytest-cov>=4.0.0
+coverage<7.4

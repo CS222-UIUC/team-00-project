@@ -88,7 +88,7 @@ Upload your handwritten picture to get started!
 </div>
 
 <script>
-    function renderLatex() {
+    function renderLatex(retry = false) {
         const input = document.getElementById("latexInput").value;
         fetch("http://127.0.0.1:5050/compile", {
             method: "POST",
@@ -104,7 +104,14 @@ Upload your handwritten picture to get started!
             const preview = document.getElementById("renderOutput");
             preview.innerHTML = `<iframe src="${url}" width="100%" height="500px"></iframe>`;
         })
-        .catch(err => alert("Render error: " + err.message));
+        .catch(err => {
+            if (!retry) {
+                console.warn("First render failed, retrying...");
+                setTimeout(() => renderLatex(true), 1000); // Retry once after 1s
+            } else {
+                alert("Render error: " + err.message);
+            }
+        });
     }
 
     function downloadPDF() {
@@ -147,66 +154,45 @@ Upload your handwritten picture to get started!
 
     // Image Upload Integration
     document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    const fileInput = document.getElementById("photoInput");
-    if (fileInput.files.length === 0) return alert("Please select an image");
+        const fileInput = document.getElementById("photoInput");
+        if (fileInput.files.length === 0) return alert("Please select an image");
 
-    const formData = new FormData();
-    formData.append("image", fileInput.files[0]);
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
 
-    try {
-        // Upload to OCR backend (surya for now)
-        const ocrResponse = await fetch("http://127.0.0.1:5050/ocr", {
-            method: "POST",
-            body: formData
-        });
+        try {
+            const ocrResponse = await fetch("http://127.0.0.1:5050/ocr", {
+                method: "POST",
+                body: formData
+            });
 
-        const ocrData = await ocrResponse.json();
+            const ocrText = await ocrResponse.text();
+            let ocrData = {};
 
-        if (ocrResponse.ok && ocrData.latex) {
-            document.getElementById("latexInput").value = ocrData.latex;
-            renderLatex();
-        } else {
-            alert("OCR failed: " + (ocrData.error || "Unknown error"));
+            try {
+                ocrData = JSON.parse(ocrText);
+            } catch (err) {
+                console.error("Invalid JSON from OCR:", ocrText);
+                alert("OCR response is not valid JSON.");
+                return;
+            }
+
+            if (ocrResponse.ok && ocrData.latex) {
+                document.getElementById("latexInput").value = ocrData.latex;
+                renderLatex();
+            } else {
+                alert("OCR failed: " + (ocrData.error || "Unknown error"));
+            }
+
+        } catch (err) {
+            alert("Error: " + err.message);
+            console.error(err);
         }
-
-        const zipResponse = await fetch('http://127.0.0.1:4000/upload', {
-            method: 'POST',
-            body: formData,
-        });
-
-        const zipResult = await zipResponse.json();
-
-        if (zipResponse.ok) {
-            const uploadedPhoto = document.getElementById('uploadedPhoto');
-            uploadedPhoto.src = `http://127.0.0.1:4000${zipResult.photo_path}`;
-            uploadedPhoto.style.display = 'block';
-
-            const zipLink = document.getElementById('zipFileLink');
-            zipLink.href = `http://127.0.0.1:4000${zipResult.zip_file_path}`;
-            zipLink.style.display = 'block';
-
-            const insertBtn = document.getElementById('insertImageBtn');
-            insertBtn.style.display = 'inline-block';
-            insertBtn.onclick = () => {
-                const input = document.getElementById('latexInput');
-                if (!input.value.includes('\\usepackage{graphicx}')) {
-                    input.value = input.value.replace(/\\documentclass\{.*?\}/,
-                        match => `${match}\n\\usepackage{graphicx}`);
-                }
-                input.value += `\n\\includegraphics[width=\\linewidth]{${uploadedPhoto.src}}\n`;
-            };
-        } else {
-            alert('ZIP upload failed: ' + zipResult.error);
-        }
-
-    } catch (err) {
-        alert("Error: " + err.message);
-        console.error(err);
-    }
-});
+    });
 </script>
+
 
 </body>
 </html>
