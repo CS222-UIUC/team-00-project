@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Main Page - Logged In</title>
@@ -33,5 +33,203 @@
             localStorage.setItem('userText', this.value);
         });
     </script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LaTeX Editor Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/latex.js/dist/latex.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #main {
+            display: flex;
+            flex: 1;
+        }
+
+        #editor, #preview {
+            flex: 1;
+            padding: 16px;
+        }
+
+        #editor {
+            background: #f2f2f2;
+        }
+
+        #preview {
+            background: #eee;
+            overflow: auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            font-family: monospace;
+        }
+
+        #buttons, #photoUpload {
+            margin-top: 8px;
+        }
+
+        #writepad {
+            background-color: #fee;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="main">
+    <div id="editor">
+        <h3>Code</h3>
+        <textarea id="latexInput">\documentclass{article}
+\begin{document}
+Upload your handwritten picture to get started!
+\end{document}</textarea>
+
+        <div id="buttons">
+            <button onclick="renderLatex()">Render</button>
+            <button onclick="copyLatex()">Copy LaTeX</button>
+            <button onclick="downloadPDF()">Download PDF</button>
+        </div>
+
+        <div id="photoUpload">
+            <h3>Upload Image</h3>
+            <form id="uploadForm">
+                <input type="file" id="photoInput" name="photo" accept="image/*" required />
+                <button type="submit">Upload</button>
+            </form>
+            <img id="uploadedPhoto" style="display: none; max-width: 300px;" alt="Uploaded Photo" />
+            <button id="insertImageBtn" style="display: none;">Insert to LaTeX</button>
+            <br/>
+            <a id="zipFileLink" style="display: none;" target="_blank">Download .zip file</a>
+        </div>
+    </div>
+
+    <div id="preview">
+        <h3>Review</h3>
+        <div id="renderOutput"></div>
+    </div>
+</div>
+
+<div id="writepad">
+    🖋️ <strong>Write Pad</strong> (Coming soon) <button>Insert ➕</button>
+</div>
+
+<script>
+    function renderLatex(retry = false) {
+        const input = document.getElementById("latexInput").value;
+        fetch("http://127.0.0.1:5050/compile", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ code: input })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Compilation failed");
+            return res.blob();
+        })
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const preview = document.getElementById("renderOutput");
+            preview.innerHTML = `<iframe src="${url}" width="100%" height="500px"></iframe>`;
+        })
+        .catch(err => {
+            if (!retry) {
+                console.warn("First render failed, retrying...");
+                setTimeout(() => renderLatex(true), 1000); // Retry once after 1s
+            } else {
+                alert("Render error: " + err.message);
+            }
+        });
+    }
+
+    function downloadPDF() {
+        const input = document.getElementById("latexInput").value;
+        fetch("http://127.0.0.1:5050/compile", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ code: input })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Download failed");
+            return res.blob();
+        })
+        .then(blob => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "output.pdf";
+            a.click();
+        })
+        .catch(err => alert("Download error: " + err.message));
+    }
+
+    function copyLatex() {
+        const textarea = document.getElementById("latexInput");
+        textarea.select();
+        document.execCommand("copy");
+        alert("LaTeX code copied!");
+    }
+
+    function downloadHTML() {
+        const preview = document.getElementById("renderOutput").innerHTML;
+        const blob = new Blob([preview], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "preview.html";
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Image Upload Integration
+    document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const fileInput = document.getElementById("photoInput");
+        if (fileInput.files.length === 0) return alert("Please select an image");
+
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+
+        try {
+            const ocrResponse = await fetch("http://127.0.0.1:5050/ocr", {
+                method: "POST",
+                body: formData
+            });
+
+            const ocrText = await ocrResponse.text();
+            let ocrData = {};
+
+            try {
+                ocrData = JSON.parse(ocrText);
+            } catch (err) {
+                console.error("Invalid JSON from OCR:", ocrText);
+                alert("OCR response is not valid JSON.");
+                return;
+            }
+
+            if (ocrResponse.ok && ocrData.latex) {
+                document.getElementById("latexInput").value = ocrData.latex;
+                renderLatex();
+            } else {
+                alert("OCR failed: " + (ocrData.error || "Unknown error"));
+            }
+
+        } catch (err) {
+            alert("Error: " + err.message);
+            console.error(err);
+        }
+    });
+</script>
+
+
 </body>
 </html>
