@@ -147,7 +147,6 @@ class AdditionalViewTests(TestCase):
         response = self.client.get(reverse("root"))
         self.assertEqual(response.status_code, 302)
 
-
     def test_login_view_logs_out_existing_logged_user(self):
         existing_user = User.objects.create_user(username="olduser", password="oldpass")
         LoggedInUser.objects.create(user=existing_user)
