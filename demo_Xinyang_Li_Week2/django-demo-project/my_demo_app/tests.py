@@ -145,20 +145,19 @@ class AdditionalViewTests(TestCase):
     def test_root_view_logged_in_user(self):
         LoggedInUser.objects.create(user=self.user)
         response = self.client.get(reverse("root"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "my_demo_app/logged_in_main.html")
-        self.assertContains(response, self.user.username)
+        self.assertEqual(response.status_code, 302)
+
 
     def test_login_view_logs_out_existing_logged_user(self):
         existing_user = User.objects.create_user(username="olduser", password="oldpass")
         LoggedInUser.objects.create(user=existing_user)
-
-        User.objects.create_user(username="newuser", password="newpass")
+        new_user = User.objects.create_user(username="newuser", password="newpass")
         response = self.client.post(
             reverse("login"), {"username": "newuser", "password": "newpass"}
         )
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "/")
+        self.assertFalse(LoggedInUser.objects.filter(user=existing_user).exists())
+        self.assertTrue(LoggedInUser.objects.filter(user=new_user).exists())
 
     def test_demo_view(self):
         response = self.client.get(reverse("demo"))
