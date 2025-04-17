@@ -17,6 +17,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 import tempfile
 
+
 @app.route("/compile", methods=["POST"])
 def compile_latex():
     raw_tex = request.form["code"]
@@ -59,6 +60,7 @@ def compile_latex():
         )
     except subprocess.CalledProcessError:
         return "Failed to compile LaTeX", 500
+
 
 @app.route("/ocr", methods=["POST"])
 def ocr_image():
