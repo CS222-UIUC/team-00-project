@@ -8,7 +8,7 @@ pip install llama-cpp-python  # If you want to use CUDA, check GitHub for instru
 ### Commands
 - Start the local model server:
     ```bash
-    uvicorn api_server:app --reload --port 8000
+    uvicorn api_server:app --reload --port 7000
     ```
 
 - Run the model functioning test:
