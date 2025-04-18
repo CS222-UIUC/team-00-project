@@ -39,7 +39,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>LaTeX Editor Demo</title>
+    <title>LaTeX Editor with AI integrated</title>
     <script src="https://cdn.jsdelivr.net/npm/latex.js/dist/latex.min.js"></script>
     <style>
         body {
@@ -83,10 +83,15 @@
             background-color: #fee;
             padding: 10px;
         }
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
     </style>
 </head>
 <body>
-
+<a href="{% url 'logout' %}" class="logout-button">Logout</a>
 <div id="main">
     <div id="editor">
         <h3>Code</h3>
@@ -125,6 +130,7 @@ Upload your handwritten picture to get started!
 </div>
 
 <script>
+    let latexCursor = { start: 0, end: 0 };
     function renderLatex(retry = false) {
         const input = document.getElementById("latexInput").value;
         fetch("http://127.0.0.1:5050/compile", {
@@ -228,7 +234,79 @@ Upload your handwritten picture to get started!
             console.error(err);
         }
     });
+    window.onload = function () {
+    // Track LaTeX editor cursor
+    let latexCursor = { start: 0, end: 0 };
+    const latexInput = document.getElementById("latexInput");
+
+    function saveCursor() {
+        latexCursor.start = latexInput.selectionStart;
+        latexCursor.end = latexInput.selectionEnd;
+    }
+
+    latexInput.addEventListener("keyup", saveCursor);
+    latexInput.addEventListener("click", saveCursor);
+    latexInput.addEventListener("focus", saveCursor);
+
+    // CLI listener
+    document.getElementById("cliInput").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            const input = this.value.trim();
+            if (!input) return;
+
+            const history = document.getElementById("cliHistory");
+            const entry = document.createElement("div");
+            entry.textContent = ">> " + input;
+            history.appendChild(entry);
+            history.scrollTop = history.scrollHeight;
+
+            fetch("http://127.0.0.1:7000/latex", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: input })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const out = document.createElement("div");
+                out.textContent = data.latex || "⚠️ No LaTeX";
+                history.appendChild(out);
+                history.scrollTop = history.scrollHeight;
+
+                if (data.latex) {
+                    const original = latexInput.value;
+
+                    latexInput.value = original.slice(0, latexCursor.start) + data.latex + original.slice(latexCursor.end);
+
+                    const cursorPosition = latexCursor.start + data.latex.length;
+                    latexInput.selectionStart = latexInput.selectionEnd = cursorPosition;
+                    latexCursor.start = latexCursor.end = cursorPosition;
+
+                    renderLatex();
+                    latexInput.focus();
+                }
+            })
+            .catch(err => {
+                const errMsg = document.createElement("div");
+                errMsg.textContent = "⚠️ Error: " + err.message;
+                errMsg.style.color = "#f55";
+                history.appendChild(errMsg);
+                history.scrollTop = history.scrollHeight;
+            });
+
+            this.value = "";
+        }
+    });
+};
+
+
 </script>
+<div id="cliBox" style="position: fixed; bottom: 10px; right: 10px; width: 320px; background: #111; color: #0f0; font-family: monospace; padding: 10px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 999;">
+    <div style="margin-bottom: 6px;">🧮 <strong>AI Helper</strong>
+        <button onclick="document.getElementById('cliBox').style.display='none'" style="float:right; font-size:12px;">×</button>
+    </div>
+    <div id="cliHistory" style="height: 120px; overflow-y: auto; background: #000; padding: 5px; margin-bottom: 6px; border: 1px solid #333;"></div>
+    <input type="text" id="cliInput" placeholder="Type here..." style="width: 100%; background: #222; color: #0f0; border: 1px solid #444; padding: 5px;" />
+</div>
 
 
 </body>

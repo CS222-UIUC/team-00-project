@@ -19,12 +19,8 @@ start_time = datetime.datetime.now()
 @permission_classes([AllowAny])
 def root_view(request):
     if LoggedInUser.objects.exists():
-        logged_in_user = LoggedInUser.objects.first()
-        return render(
-            request,
-            "my_demo_app/logged_in_main.html",
-            {"username": logged_in_user.user.username},
-        )
+        # Redirect logged-in users to /logged_in/
+        return redirect("logged_in")
     else:
         message = request.GET.get("message", None)
         return render(request, "my_demo_app/index.html", {"message": message})
