@@ -87,4 +87,4 @@ def ocr_image():
 if __name__ == "__main__":  # pragma: no cover
     dummy = Image.new("RGB", (10, 10), color="white")
     _ = predictor([dummy])
-    app.run(host="0.0.0.0", port=5050, debug=True)
+    app.run(host="127.0.0.1", port=5050, debug=True)
