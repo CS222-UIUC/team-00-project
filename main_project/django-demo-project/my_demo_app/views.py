@@ -7,8 +7,8 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import LoggedInUser, UserTextData
-from .forms import UserTextDataForm
-from django.views.decorators.csrf import csrf_exempt
+# from .forms import UserTextDataForm
+# from django.views.decorators.csrf import csrf_exempt
 import datetime
 
 User = get_user_model()
@@ -147,9 +147,9 @@ def logout_view(request):
 
 
 DEFAULT_LATEX = r"""\documentclass{article}
-\usepackage{amsmath} 
+\usepackage{amsmath}
 \begin{document}
-Developed by Team 00. 
+Developed by Team 00.
 
 Getting started:
 
