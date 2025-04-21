@@ -19,7 +19,7 @@ cd /d %~dp0\LaTex_editor_Tectonic_ver
 start cmd /k call "%CONDA_ACTIVATE%" %CONDA_ENV% ^&^& python -m backend.server
 
 REM Start Django server
-cd /d %~dp0\demo_Xinyang_Li_Week2\django-demo-project
+cd /d %~dp0\main_project\django-demo-project
 start cmd /k call "%CONDA_ACTIVATE%" %CONDA_ENV% ^&^& python manage.py runserver
 
 cd /d %~dp0

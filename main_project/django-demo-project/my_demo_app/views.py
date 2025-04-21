@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import LoggedInUser, UserTextData
 from .forms import UserTextDataForm
+from django.views.decorators.csrf import csrf_exempt
 import datetime
 
 User = get_user_model()
@@ -114,25 +115,22 @@ def oauth_success_view(request):
 @login_required
 def logged_in_view(request):
     user = request.user
-    try:
-        user_text_data = UserTextData.objects.get(user=user)
-    except UserTextData.DoesNotExist:
-        user_text_data = None
-
     if request.method == "POST":
-        form = UserTextDataForm(request.POST, instance=user_text_data)
-        if form.is_valid():
-            user_text_data = form.save(commit=False)
-            user_text_data.user = user
-            user_text_data.save()
-            return redirect("logged_in")
-    else:
-        form = UserTextDataForm(instance=user_text_data)
+        name = request.POST.get("name")
+        if name:
+            doc, created = UserTextData.objects.get_or_create(
+                user=request.user, name=name
+            )
+            return redirect("latex_editor", doc_id=doc.id)
 
+    docs = UserTextData.objects.filter(user=user)
     return render(
         request,
-        "my_demo_app/logged_in_main.html",
-        {"username": user.username, "form": form},
+        "my_demo_app/document_list.html",
+        {
+            "username": user.username,
+            "documents": docs,
+        },
     )
 
 
@@ -146,3 +144,57 @@ def logout_view(request):
         pass
     logout(request)
     return redirect("/")
+
+
+DEFAULT_LATEX = r"""\documentclass{article}
+\usepackage{amsmath} 
+\begin{document}
+Developed by Team 00. 
+
+Getting started:
+
+1. Direct text input
+
+2. Upload your image
+
+3. Describe math formula you want in natural language to the chatbot
+
+\end{document}"""
+
+
+@login_required
+def latex_editor_view(request, doc_id):
+    user = request.user
+
+    try:
+        document = UserTextData.objects.get(id=doc_id, user=user)
+    except UserTextData.DoesNotExist:
+        return redirect("logged_in")
+
+    if request.method == "POST":
+        content = request.POST.get("content")
+        new_name = request.POST.get("name", document.name)
+
+        if new_name != document.name:
+            if (
+                UserTextData.objects.filter(user=user, name=new_name)
+                .exclude(id=document.id)
+                .exists()
+            ):
+                return JsonResponse({"error": "Name already in use"}, status=400)
+            document.name = new_name
+
+        document.text_data = content
+        document.save()
+        return JsonResponse(
+            {"status": "updated", "doc_name": document.name, "doc_id": document.id}
+        )
+
+    return render(
+        request,
+        "my_demo_app/latex_editor.html",
+        {
+            "username": user.username,
+            "document": document,
+        },
+    )

@@ -12,7 +12,7 @@ cd ../LaTex_editor_Tectonic_ver
 gnome-terminal -- bash -c "python -m backend.server; exec bash" &
 
 # Start Django server
-cd ../demo_Xinyang_Li_Week2/django-demo-project
+cd ../main_project/django-demo-project
 gnome-terminal -- bash -c "python manage.py runserver; exec bash" &
 
 # Return to script directory
