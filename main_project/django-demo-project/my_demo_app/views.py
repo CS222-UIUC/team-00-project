@@ -119,7 +119,9 @@ def logged_in_view(request):
     if request.method == "POST":
         name = request.POST.get("name")
         if name:
-            doc, created = UserTextData.objects.get_or_create(user=request.user, name=name)
+            doc, created = UserTextData.objects.get_or_create(
+                user=request.user, name=name
+            )
             if created:
                 doc.text_data = DEFAULT_LATEX
                 doc.save()
