@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Documents</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<a href="{% url 'logout' %}" class="logout-button">Logout</a>
+
+<h2>Your Documents</h2>
+<ul>
+    {% for doc in documents %}
+    <li><a href="{% url 'latex_editor' doc.id %}">{{ doc.name }}</a></li>
+    {% endfor %}
+</ul>
+
+<h3>Create New Document</h3>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Document name" required>
+    <button type="submit">Create</button>
+</form>
+
+</body>
+</html>

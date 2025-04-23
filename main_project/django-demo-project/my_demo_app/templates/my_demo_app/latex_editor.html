@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LaTeX Editor with AI integrated</title>
+    <script src="https://cdn.jsdelivr.net/npm/latex.js/dist/latex.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #main {
+            display: flex;
+            flex: 1;
+        }
+
+        #editor, #preview {
+            flex: 1;
+            padding: 16px;
+        }
+
+        #editor {
+            background: #f2f2f2;
+        }
+
+        #preview {
+            background: #eee;
+            overflow: auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            font-family: monospace;
+        }
+
+        #buttons, #photoUpload {
+            margin-top: 8px;
+        }
+
+        #writepad {
+            background-color: #fee;
+            padding: 10px;
+        }
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            right: 140px; /* adjust if it overlaps logout */
+        }
+    </style>
+</head>
+<body>
+<a href="{% url 'logout' %}" class="logout-button">Logout</a>
+<a href="{% url 'document_list' %}" class="back-button">
+    <button>← Back to Document List</button>
+</a>
+<h2>Editing: <code>{{ document.name }}</code></h2>
+<div id="main">
+    <div id="editor">
+        <h3>Code</h3>
+        <textarea id="latexInput">{% autoescape off %}{{ document.text_data }}{% endautoescape %}</textarea>
+
+        <div id="buttons">
+            <button onclick="renderLatex()">Render</button>
+            <button onclick="copyLatex()">Copy LaTeX</button>
+            <button onclick="downloadPDF()">Download PDF</button>
+            <button onclick="saveDocument()">Save</button>
+        </div>
+
+        <div id="photoUpload">
+            <h3>Upload Image</h3>
+            <form id="uploadForm">
+                <input type="file" id="photoInput" name="photo" accept="image/*" required />
+                <button type="submit">Upload</button>
+            </form>
+            <img id="uploadedPhoto" style="display: none; max-width: 300px;" alt="Uploaded Photo" />
+            <button id="insertImageBtn" style="display: none;">Insert to LaTeX</button>
+            <br/>
+            <a id="zipFileLink" style="display: none;" target="_blank">Download .zip file</a>
+        </div>
+    </div>
+
+    <div id="preview">
+        <h3>Review</h3>
+        <div id="renderOutput"></div>
+    </div>
+</div>
+
+<div id="writepad">
+    🖋️ <strong>Write Pad</strong> (Coming soon) <button>Insert ➕</button>
+</div>
+
+<script>
+    let latexCursor = { start: 0, end: 0 };
+    function renderLatex(retry = false) {
+        const input = document.getElementById("latexInput").value;
+        fetch("http://127.0.0.1:5050/compile", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ code: input })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Compilation failed");
+            return res.blob();
+        })
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const preview = document.getElementById("renderOutput");
+            preview.innerHTML = `<iframe src="${url}" width="100%" height="500px"></iframe>`;
+        })
+        .catch(err => {
+            if (!retry) {
+                console.warn("First render failed, retrying...");
+                setTimeout(() => renderLatex(true), 1000); // Retry once after 1s
+            } else {
+                alert("Render error: " + err.message);
+            }
+        });
+    }
+
+    function downloadPDF() {
+        const input = document.getElementById("latexInput").value;
+        fetch("http://127.0.0.1:5050/compile", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ code: input })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Download failed");
+            return res.blob();
+        })
+        .then(blob => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "output.pdf";
+            a.click();
+        })
+        .catch(err => alert("Download error: " + err.message));
+    }
+
+    function copyLatex() {
+        const textarea = document.getElementById("latexInput");
+        textarea.select();
+        document.execCommand("copy");
+        alert("LaTeX code copied!");
+    }
+
+    function downloadHTML() {
+        const preview = document.getElementById("renderOutput").innerHTML;
+        const blob = new Blob([preview], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "preview.html";
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Image Upload Integration
+    document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const fileInput = document.getElementById("photoInput");
+    if (fileInput.files.length === 0) return alert("Please select an image");
+
+    const formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+
+    latexCursor.start = latexInput.selectionStart;
+    latexCursor.end = latexInput.selectionEnd;
+
+    try {
+        const ocrResponse = await fetch("http://127.0.0.1:5050/ocr", {
+            method: "POST",
+            body: formData
+        });
+
+        const ocrText = await ocrResponse.text();
+        let ocrData = {};
+
+        try {
+            ocrData = JSON.parse(ocrText);
+        } catch (err) {
+            console.error("Invalid JSON from OCR:", ocrText);
+            alert("OCR response is not valid JSON.");
+            return;
+        }
+
+        if (ocrResponse.ok && ocrData.latex) {
+            const original = latexInput.value;
+            latexInput.value = original.slice(0, latexCursor.start) + ocrData.latex + original.slice(latexCursor.end);
+
+            const cursorPosition = latexCursor.start + ocrData.latex.length;
+            latexInput.selectionStart = latexInput.selectionEnd = cursorPosition;
+            latexCursor.start = latexCursor.end = cursorPosition;
+
+            renderLatex();
+            latexInput.focus();
+        } else {
+            alert("OCR failed: " + (ocrData.error || "Unknown error"));
+        }
+
+    } catch (err) {
+        alert("Error: " + err.message);
+        console.error(err);
+    }
+});
+window.onload = function () {
+    // Track LaTeX editor cursor
+    let latexCursor = { start: 0, end: 0 };
+    const latexInput = document.getElementById("latexInput");
+    function saveCursor() {
+        latexCursor.start = latexInput.selectionStart;
+        latexCursor.end = latexInput.selectionEnd;
+    }
+
+    latexInput.addEventListener("keyup", saveCursor);
+    latexInput.addEventListener("click", saveCursor);
+    latexInput.addEventListener("focus", saveCursor);
+    renderLatex();
+    // CLI listener
+    document.getElementById("cliInput").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            const input = this.value.trim();
+            if (!input) return;
+
+            const history = document.getElementById("cliHistory");
+            const entry = document.createElement("div");
+            entry.textContent = ">> " + input;
+            history.appendChild(entry);
+            history.scrollTop = history.scrollHeight;
+
+            fetch("http://127.0.0.1:7000/latex", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: input })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const out = document.createElement("div");
+                out.textContent = data.latex || "⚠️ No LaTeX";
+                history.appendChild(out);
+                history.scrollTop = history.scrollHeight;
+
+                if (data.latex) {
+                    const original = latexInput.value;
+
+                    latexInput.value = original.slice(0, latexCursor.start) + data.latex + original.slice(latexCursor.end);
+
+                    const cursorPosition = latexCursor.start + data.latex.length;
+                    latexInput.selectionStart = latexInput.selectionEnd = cursorPosition;
+                    latexCursor.start = latexCursor.end = cursorPosition;
+
+                    renderLatex();
+                    latexInput.focus();
+                }
+            })
+            .catch(err => {
+                const errMsg = document.createElement("div");
+                errMsg.textContent = "⚠️ Error: " + err.message;
+                errMsg.style.color = "#f55";
+                history.appendChild(errMsg);
+                history.scrollTop = history.scrollHeight;
+            });
+
+            this.value = "";
+        }
+    });
+
+};
+function saveDocument() {
+    const content = document.getElementById("latexInput").value;
+    const currentName = "{{ document.name }}";
+    const currentId = "{{ document.id }}";
+    const newName = prompt("Enter document name:", currentName);
+
+    if (!newName) return alert("❗ Document name is required to save.");
+
+    fetch("", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: new URLSearchParams({
+            content,
+            name: newName
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            alert("❌ " + data.error);
+        } else {
+            alert("✅ Document saved as: " + data.doc_name);
+            if (data.doc_id !== currentId) {
+                window.location.href = `/documents/${data.doc_id}/`;
+            }
+        }
+    })
+    .catch(err => {
+        alert("❌ Save failed: " + err.message);
+    });
+}
+
+
+
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+</script>
+<div id="cliBox" style="position: fixed; bottom: 10px; right: 10px; width: 320px; background: #111; color: #0f0; font-family: monospace; padding: 10px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 999;">
+    <div style="margin-bottom: 6px;">🧮 <strong>AI Helper</strong>
+        <button onclick="document.getElementById('cliBox').style.display='none'" style="float:right; font-size:12px;">×</button>
+    </div>
+    <div id="cliHistory" style="height: 120px; overflow-y: auto; background: #000; padding: 5px; margin-bottom: 6px; border: 1px solid #333;"></div>
+    <input type="text" id="cliInput" placeholder="Type here..." style="width: 100%; background: #222; color: #0f0; border: 1px solid #444; padding: 5px;" />
+</div>
+
+
+</body>
+</html>

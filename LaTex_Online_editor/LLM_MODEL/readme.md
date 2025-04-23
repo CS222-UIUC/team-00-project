@@ -3,7 +3,7 @@ pip install llama-cpp-python  # If you want to use CUDA, check GitHub for instru
 ```
 
 ### Library
-[Janus-Pro-7B-LM-GGUF](https://huggingface.co/mradermacher/Janus-Pro-7B-LM-GGUF?library=llama-cpp-python)
+[model_deepseek_math](https://huggingface.co/Theta-Lev/deepseek-math-7b-base-Q8_0-GGUF)
 
 ### Commands
 - Start the local model server:

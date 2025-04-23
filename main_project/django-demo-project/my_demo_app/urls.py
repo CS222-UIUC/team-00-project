@@ -10,4 +10,6 @@ urlpatterns = [
     path("oauth_success/", views.oauth_success_view, name="oauth_success"),
     path("logged_in/", views.logged_in_view, name="logged_in"),
     path("logout/", views.logout_view, name="logout"),
+    path("documents/<int:doc_id>/", views.latex_editor_view, name="latex_editor"),
+    path("documents/", views.logged_in_view, name="document_list"),
 ]

@@ -120,7 +120,7 @@ class AdditionalViewTests(TestCase):
             data={"name": "", "text_data": ""},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "my_demo_app/logged_in_main.html")
+        self.assertTemplateUsed(response, "my_demo_app/document_list.html")
 
     def test_logout_view(self):
         response = self.client.get(reverse("logout"))
@@ -167,3 +167,43 @@ class AdditionalViewTests(TestCase):
         response = self.client.get(reverse("oauth_success"))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, "/")
+
+
+class LatexEditorViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.client.login(username="testuser", password="testpass")
+        self.document = UserTextData.objects.create(
+            user=self.user, name="Test Document", text_data="Initial content"
+        )
+
+    def test_latex_editor_view_get_valid_document(self):
+        response = self.client.get(reverse("latex_editor", args=[self.document.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "my_demo_app/latex_editor.html")
+        self.assertContains(response, self.document.name)
+        self.assertContains(response, self.document.text_data)
+
+    def test_latex_editor_view_get_invalid_document(self):
+        response = self.client.get(reverse("latex_editor", args=[999]))
+        self.assertEqual(response.status_code, 302)  # Redirects to "logged_in"
+
+    def test_latex_editor_view_post_update_document(self):
+        response = self.client.post(
+            reverse("latex_editor", args=[self.document.id]),
+            data={"content": "Updated content", "name": "Updated Name"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.text_data, "Updated content")
+        self.assertEqual(self.document.name, "Updated Name")
+
+    def test_latex_editor_view_post_duplicate_name(self):
+        # Create another document with the same user and name
+        UserTextData.objects.create(user=self.user, name="Duplicate Name")
+        response = self.client.post(
+            reverse("latex_editor", args=[self.document.id]),
+            data={"content": "New content", "name": "Duplicate Name"},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Name already in use", response.json()["error"])

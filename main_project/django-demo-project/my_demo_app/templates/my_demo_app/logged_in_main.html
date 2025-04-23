@@ -1,40 +1,3 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Main Page - Logged In</title>
-    <style>
-        .logout-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-    </style>
-</head>
-<body>
-    {% load static %}
-    <h1>Welcome, {{ username }}!</h1>
-    <a href="{% url 'logout' %}" class="logout-button">Logout</a>
-
-    <form method="post">
-        {% csrf_token %}
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" value="{{ form.name.value }}" placeholder="Enter your name">
-        <label for="text_data">Your Text:</label>
-        <textarea id="editor" name="text_data" rows="10" cols="50">{{ form.text_data.value }}</textarea>
-        <button type="submit">Save</button>
-    </form>
-
-    <script>
-        // Load the saved text from localStorage
-        document.getElementById('editor').value = localStorage.getItem('userText') || '';
-
-        // Save the text to localStorage on input
-        document.getElementById('editor').addEventListener('input', function() {
-            localStorage.setItem('userText', this.value);
-        });
-    </script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,9 +58,20 @@
 <div id="main">
     <div id="editor">
         <h3>Code</h3>
-        <textarea id="latexInput">\documentclass{article}
+        <textarea id="latexInput">
+\documentclass{article}
+\usepackage{amsmath} 
 \begin{document}
-Upload your handwritten picture to get started!
+Developed by Team 00. 
+
+Getting started:
+
+1. Direct text input
+
+2. Upload your image
+
+3. Describe math formula you want in natural language to the chatbot
+
 \end{document}</textarea>
 
         <div id="buttons">
@@ -197,43 +171,53 @@ Upload your handwritten picture to get started!
 
     // Image Upload Integration
     document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
+    e.preventDefault();
 
-        const fileInput = document.getElementById("photoInput");
-        if (fileInput.files.length === 0) return alert("Please select an image");
+    const fileInput = document.getElementById("photoInput");
+    if (fileInput.files.length === 0) return alert("Please select an image");
 
-        const formData = new FormData();
-        formData.append("image", fileInput.files[0]);
+    const formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+
+    latexCursor.start = latexInput.selectionStart;
+    latexCursor.end = latexInput.selectionEnd;
+
+    try {
+        const ocrResponse = await fetch("http://127.0.0.1:5050/ocr", {
+            method: "POST",
+            body: formData
+        });
+
+        const ocrText = await ocrResponse.text();
+        let ocrData = {};
 
         try {
-            const ocrResponse = await fetch("http://127.0.0.1:5050/ocr", {
-                method: "POST",
-                body: formData
-            });
-
-            const ocrText = await ocrResponse.text();
-            let ocrData = {};
-
-            try {
-                ocrData = JSON.parse(ocrText);
-            } catch (err) {
-                console.error("Invalid JSON from OCR:", ocrText);
-                alert("OCR response is not valid JSON.");
-                return;
-            }
-
-            if (ocrResponse.ok && ocrData.latex) {
-                document.getElementById("latexInput").value = ocrData.latex;
-                renderLatex();
-            } else {
-                alert("OCR failed: " + (ocrData.error || "Unknown error"));
-            }
-
+            ocrData = JSON.parse(ocrText);
         } catch (err) {
-            alert("Error: " + err.message);
-            console.error(err);
+            console.error("Invalid JSON from OCR:", ocrText);
+            alert("OCR response is not valid JSON.");
+            return;
         }
-    });
+
+        if (ocrResponse.ok && ocrData.latex) {
+            const original = latexInput.value;
+            latexInput.value = original.slice(0, latexCursor.start) + ocrData.latex + original.slice(latexCursor.end);
+
+            const cursorPosition = latexCursor.start + ocrData.latex.length;
+            latexInput.selectionStart = latexInput.selectionEnd = cursorPosition;
+            latexCursor.start = latexCursor.end = cursorPosition;
+
+            renderLatex();
+            latexInput.focus();
+        } else {
+            alert("OCR failed: " + (ocrData.error || "Unknown error"));
+        }
+
+    } catch (err) {
+        alert("Error: " + err.message);
+        console.error(err);
+    }
+});
     window.onload = function () {
     // Track LaTeX editor cursor
     let latexCursor = { start: 0, end: 0 };
