@@ -1,46 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Your Documents</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
+  <meta charset="UTF-8">
+  <title>Your Documents</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #f9f9f9;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h2 { margin: 0; }
 
-        .logout-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
+    /* Table styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th { background: #fafafa; }
 
-        ul {
-            padding-left: 20px;
-        }
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      margin: 0 0.2rem;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-edit {
+      background: #4CAF50;
+      color: #fff;
+    }
+    .btn-delete {
+      background: #F44336;
+      color: #fff;
+    }
+    .btn-create {
+      background: #2196F3;
+      color: #fff;
+      margin-top: 1rem;
+    }
 
-        form {
-            margin-top: 20px;
-        }
-    </style>
+    /* Form */
+    .new-doc-form {
+      display: flex;
+      margin-top: 1rem;
+    }
+    .new-doc-form input {
+      flex: 1;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px 0 0 4px;
+    }
+    .new-doc-form button {
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
 </head>
 <body>
 
-<a href="{% url 'logout' %}" class="logout-button">Logout</a>
+  <div class="header">
+    <h2>Your Documents</h2>
+    <a href="{% url 'logout' %}" class="btn">Logout</a>
+  </div>
 
-<h2>Your Documents</h2>
-<ul>
-    {% for doc in documents %}
-    <li><a href="{% url 'latex_editor' doc.id %}">{{ doc.name }}</a></li>
-    {% endfor %}
-</ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="width: 200px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for doc in documents %}
+      <tr>
+        <td>{{ doc.name }}</td>
+        <td>
+          <a href="{% url 'latex_editor' doc.id %}" class="btn btn-edit">
+            Edit
+          </a>
 
-<h3>Create New Document</h3>
-<form method="post">
+          <form
+            action="{% url 'document_delete' doc.id %}"
+            method="post"
+            style="display:inline"
+            onsubmit="return confirm('Are you sure you want to delete &quot;{{ doc.name }}&quot;?');"
+          >
+            {% csrf_token %}
+            <button type="submit" class="btn btn-delete">
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="2" style="text-align:center; color:#777;">
+          You have no documents yet.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <form method="post" class="new-doc-form">
     {% csrf_token %}
-    <input type="text" name="name" placeholder="Document name" required>
-    <button type="submit">Create</button>
-</form>
+    <input type="text" name="name" placeholder="New document name" required>
+    <button type="submit" class="btn btn-create">Create</button>
+  </form>
 
 </body>
 </html>

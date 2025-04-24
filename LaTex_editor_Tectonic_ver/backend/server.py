@@ -1,3 +1,4 @@
+import tempfile
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -7,7 +8,7 @@ import uuid
 import os
 import subprocess
 from flask import after_this_request
-from backend.ocr import predict_latex, wrap_latex
+from backend.ocr import predict_latex
 
 app = Flask(__name__)
 CORS(app)
@@ -15,17 +16,10 @@ CORS(app)
 UPLOAD_FOLDER = "math_formulas"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-import tempfile
-
 
 @app.route("/compile", methods=["POST"])
 def compile_latex():
-    raw_tex = request.form["code"]
-    tex_code = (
-        wrap_latex(raw_tex)
-        if not raw_tex.strip().startswith("\\documentclass")
-        else raw_tex
-    )
+    tex_code = request.form["code"]
 
     temp_dir = tempfile.mkdtemp()  # Create a temporary directory
     tex_file = os.path.join(temp_dir, "document.tex")
@@ -82,6 +76,12 @@ def ocr_image():
     finally:
         if os.path.exists(path):
             os.remove(path)
+
+
+@app.route('/', methods=['GET'])
+def index_ui():
+    ui_path = os.path.join(os.path.dirname(__file__), '..', 'index.html')
+    return send_file(ui_path)
 
 
 if __name__ == "__main__":  # pragma: no cover

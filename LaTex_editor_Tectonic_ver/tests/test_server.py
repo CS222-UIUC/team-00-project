@@ -1,4 +1,5 @@
 import io
+import pytest
 from io import BytesIO
 from PIL import Image
 from backend.server import app
@@ -73,3 +74,23 @@ def test_ocr_image_error(client):
         response = client.post("/ocr", data=data, content_type="multipart/form-data")
         assert response.status_code == 500
         assert "error" in response.json
+
+
+@pytest.fixture(autouse=True)
+def client():
+    app.config["TESTING"] = True
+    with app.test_client() as client:
+        yield client
+
+def test_compile_triggers_cleanup_exception(monkeypatch):
+    import backend.server as server
+    monkeypatch.setattr(server.os.path, "exists", lambda path: True)
+    def fake_remove(path):
+        raise Exception("fake remove error")
+    monkeypatch.setattr(server.os, "remove", fake_remove)
+
+    code = r"\documentclass{article}\begin{document}OK\end{document}"
+    resp = app.test_client().post("/compile", data={"code": code})
+
+    assert resp.status_code == 200
+    assert resp.mimetype == "application/pdf"

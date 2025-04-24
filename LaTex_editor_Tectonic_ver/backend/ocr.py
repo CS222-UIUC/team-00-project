@@ -21,7 +21,7 @@ def predict_latex(image_path):
 
 def extract_latex(text):
     if text.startswith("text="):
-        text = text[len("text=") :].strip()
+        text = text[len("text="):].strip()
     if "confidence=" in text:
         text = text.split("confidence=")[0].strip()
     if len(text) >= 2 and text[0] in ['"', "'"] and text[-1] in ['"', "'"]:

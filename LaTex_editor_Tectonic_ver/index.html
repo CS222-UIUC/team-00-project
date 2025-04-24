@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -191,7 +191,8 @@ Getting started:
             }
 
             if (ocrResponse.ok && ocrData.latex) {
-                document.getElementById("latexInput").value = ocrData.latex;
+                // document.getElementById("latexInput").value = ocrData.latex;
+                '$$' + latex + '$$'
                 renderLatex();
             } else {
                 alert("OCR failed: " + (ocrData.error || "Unknown error"));
@@ -204,6 +205,159 @@ Getting started:
     });
 </script>
 
+
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LaTeX Editor Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/latex.js/dist/latex.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #main {
+            display: flex;
+            flex: 1;
+        }
+
+        #editor, #preview {
+            flex: 1;
+            padding: 16px;
+        }
+
+        #editor {
+            background: #f2f2f2;
+        }
+
+        #preview {
+            background: #eee;
+            overflow: auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            font-family: monospace;
+        }
+
+        #buttons, #photoUpload {
+            margin-top: 8px;
+        }
+
+        #writepad {
+            background-color: #fee;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="main">
+    <div id="editor">
+        <h3>Code</h3>
+        <textarea id="latexInput">\documentclass{article}
+\usepackage{amsmath}
+\begin{document}
+Developed by Team 00.
+
+Getting started:
+
+1. Direct text input
+
+2. Upload your image
+
+3. Describe math formula you want in natural language to the chatbot
+
+\end{document}</textarea>
+
+        <div id="buttons">
+            <button onclick="renderLatex()">Render</button>
+            <button onclick="copyLatex()">Copy LaTeX</button>
+            <button onclick="downloadPDF()">Download PDF</button>
+        </div>
+
+        <div id="photoUpload">
+            <h3>Upload Image</h3>
+            <form id="uploadForm">
+                <input type="file" id="photoInput" accept="image/*" required />
+                <button type="submit">Upload & Extract</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="preview">
+        <h3>Review</h3>
+        <div id="renderOutput"></div>
+    </div>
+</div>
+
+<div id="writepad">
+    🖋️ <strong>Write Pad</strong> (Coming soon) <button>Insert ➕</button>
+</div>
+
+<script>
+    // 1. Before you even fire the OCR request:
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alert('[OCR] handler fired!');
+      console.log('[OCR] uploadForm submit triggered');
+  
+      const fileInput = document.getElementById('photoInput');
+      console.log('[OCR] file selected?', fileInput.files.length > 0);
+  
+      // …
+  
+      try {
+        console.log('[OCR] Sending image to /ocr…');
+        const res = await fetch('http://127.0.0.1:5050/ocr', {
+          method: 'POST',
+          body: formData
+        });
+        console.log('[OCR] Response status:', res.status);
+  
+        const data = await res.json();
+        console.log('[OCR] JSON payload:', data);
+  
+        // 2. Before insertion:
+        console.log('[OCR] About to insert latex:', data.latex);
+        console.trace();    // shows call stack
+        insertLatexAtCursor(data.latex);
+      } catch (err) {
+        console.error('[OCR] failed:', err);
+        alert(err.message);
+      }
+    });
+  
+    // 3. Inside your insertion helper:
+    function insertLatexAtCursor(latex) {
+      console.log('[Insert] raw latex in helper:', latex);
+      const ta = document.getElementById('latexInput');
+      console.log('[Insert] textarea before:', ta.value);
+      console.log('[Insert] selection start/end:', ta.selectionStart, ta.selectionEnd);
+  
+      const wrapped = '$$' + latex + '$$';
+      console.log('[Insert] wrapped:', wrapped);
+  
+      const before = ta.value.slice(0, ta.selectionStart);
+      const after  = ta.value.slice(ta.selectionEnd);
+      ta.value = before + wrapped + after;
+  
+      console.log('[Insert] textarea after:', ta.value);
+  
+      const pos = ta.selectionStart = ta.selectionEnd = before.length + wrapped.length;
+      console.log('[Insert] new cursor pos:', pos);
+      ta.focus();
+    }
+  </script>  
 
 </body>
 </html>
