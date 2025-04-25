@@ -17,9 +17,7 @@ def detect_symbols_frcnn(image_input, confidence_threshold=0.5):
     else:
         raise ValueError("Unsupported image input type")
 
-    transform = transforms.Compose([
-        transforms.ToTensor()
-    ])
+    transform = transforms.Compose([transforms.ToTensor()])
     img_tensor = transform(image)
 
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
@@ -28,8 +26,8 @@ def detect_symbols_frcnn(image_input, confidence_threshold=0.5):
     with torch.no_grad():
         predictions = model([img_tensor])[0]
 
-    boxes = predictions['boxes']
-    scores = predictions['scores']
+    boxes = predictions["boxes"]
+    scores = predictions["scores"]
 
     cropped = []
     for box, score in zip(boxes, scores):

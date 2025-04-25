@@ -24,7 +24,7 @@ def connected_components(image_input, min_area=10):
     for i in range(1, num_labels):
         x, y, w, h, area = stats[i]
         if area >= min_area and w < img.shape[1] and h < img.shape[0]:
-            symbol_img = binary[y:y+h, x:x+w]
+            symbol_img = binary[y : y + h, x : x + w]
             symbols.append((x, symbol_img))
 
     symbols.sort(key=lambda item: item[0])

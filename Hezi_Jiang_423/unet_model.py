@@ -17,7 +17,7 @@ class UNet(nn.Module):
             return nn.Sequential(
                 nn.Conv2d(in_c, out_c, 3, padding=1),
                 nn.BatchNorm2d(out_c),
-                nn.ReLU(inplace=True)
+                nn.ReLU(inplace=True),
             )
 
         self.enc1 = nn.Sequential(CBR(in_channels, 64), CBR(64, 64))
@@ -57,6 +57,6 @@ def segment_symbols_unet(image_input, model, threshold=0.5, min_area=10):
     for i in range(1, num_labels):
         x, y, w, h, area = stats[i]
         if area >= min_area:
-            symbols.append(image[y:y+h, x:x+w])
+            symbols.append(image[y : y + h, x : x + w])
 
     return symbols
