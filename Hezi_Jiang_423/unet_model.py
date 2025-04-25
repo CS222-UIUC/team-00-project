@@ -12,7 +12,7 @@ class UNet(nn.Module):
 
     def __init__(self, in_channels=1, out_channels=1):
         super().__init__()
-        
+
         def CBR(in_c, out_c):
             return nn.Sequential(
                 nn.Conv2d(in_c, out_c, 3, padding=1),
