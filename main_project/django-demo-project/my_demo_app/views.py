@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
@@ -201,4 +201,22 @@ def latex_editor_view(request, doc_id):
             "username": user.username,
             "document": document,
         },
+    )
+
+
+@login_required
+def delete_document(request, doc_id):
+    """
+    Delete a UserTextData if it belongs to the current user.
+    Shows a simple browser confirm, or deletes on POST.
+    """
+    doc = get_object_or_404(UserTextData, id=doc_id, user=request.user)
+    if request.method == "POST":
+        doc.delete()
+        return redirect("document_list")
+    # If you ever wanted a custom confirmation page, render it here:
+    return render(
+        request,
+        "my_demo_app/document_confirm_delete.html",
+        {"document": doc},
     )
