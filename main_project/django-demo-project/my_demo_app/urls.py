@@ -12,5 +12,7 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("documents/<int:doc_id>/", views.latex_editor_view, name="latex_editor"),
     path("documents/", views.logged_in_view, name="document_list"),
-    path('documents/<int:doc_id>/delete/', views.delete_document,name='document_delete'),
+    path(
+        "documents/<int:doc_id>/delete/", views.delete_document, name="document_delete"
+    ),
 ]

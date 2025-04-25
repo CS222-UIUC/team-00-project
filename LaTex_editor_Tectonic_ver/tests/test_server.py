@@ -82,11 +82,15 @@ def client():
     with app.test_client() as client:
         yield client
 
+
 def test_compile_triggers_cleanup_exception(monkeypatch):
     import backend.server as server
+
     monkeypatch.setattr(server.os.path, "exists", lambda path: True)
+
     def fake_remove(path):
         raise Exception("fake remove error")
+
     monkeypatch.setattr(server.os, "remove", fake_remove)
 
     code = r"\documentclass{article}\begin{document}OK\end{document}"

@@ -78,9 +78,9 @@ def ocr_image():
             os.remove(path)
 
 
-@app.route('/', methods=['GET'])
+@app.route("/", methods=["GET"])
 def index_ui():
-    ui_path = os.path.join(os.path.dirname(__file__), '..', 'index.html')
+    ui_path = os.path.join(os.path.dirname(__file__), "..", "index.html")
     return send_file(ui_path)
 
 

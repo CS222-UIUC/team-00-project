@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
@@ -7,7 +7,6 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import LoggedInUser, UserTextData
-from django.shortcuts import get_object_or_404, render, redirect
 
 # from .forms import UserTextDataForm
 # from django.views.decorators.csrf import csrf_exempt
@@ -203,6 +202,7 @@ def latex_editor_view(request, doc_id):
             "document": document,
         },
     )
+
 
 @login_required
 def delete_document(request, doc_id):
