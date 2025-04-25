@@ -7,7 +7,9 @@ import cv2
 import numpy as np
 from torchvision import transforms
 
+
 class UNet(nn.Module):
+
     def __init__(self, in_channels=1, out_channels=1):
         super().__init__()
         def CBR(in_c, out_c):
@@ -30,6 +32,7 @@ class UNet(nn.Module):
         d1 = self.dec1(d1)
         out = self.final(d1)
         return torch.sigmoid(out)
+
 
 def segment_symbols_unet(image_input, model, threshold=0.5, min_area=10):
     if isinstance(image_input, str):

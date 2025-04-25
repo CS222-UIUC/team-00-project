@@ -6,6 +6,7 @@ from torchvision import transforms
 from PIL import Image
 import numpy as np
 
+
 def detect_symbols_frcnn(image_input, confidence_threshold=0.5):
     if isinstance(image_input, str):
         image = Image.open(image_input).convert("RGB")
@@ -34,7 +35,8 @@ def detect_symbols_frcnn(image_input, confidence_threshold=0.5):
     for box, score in zip(boxes, scores):
         if score >= confidence_threshold:
             xmin, ymin, xmax, ymax = box.int().tolist()
-            cropped_img = img_tensor[:, ymin:ymax, xmin:xmax].mul(255).byte().permute(1, 2, 0).numpy()
+            cropped_img = img_tensor[:, ymin:ymax, xmin:xmax]
+            cropped_img = cropped_img.mul(255).byte().permute(1, 2, 0).numpy()
             cropped.append(cropped_img)
 
     return cropped

@@ -1,14 +1,13 @@
 import cv2
-import numpy as np
+
 
 def connected_components(image_input, min_area=10):
     """
     Given an image of a handwritten formula, extract and return individual symbol images.
-    
+
     Args:
         image_input: str (file path) or np.ndarray (image loaded already)
         min_area: minimum area to filter out small noise
-    
     Returns:
         List of np.ndarray: each is a cropped image of a symbol
     """
@@ -28,7 +27,5 @@ def connected_components(image_input, min_area=10):
             symbol_img = binary[y:y+h, x:x+w]
             symbols.append((x, symbol_img))
 
-
     symbols.sort(key=lambda item: item[0])
-
     return [img for (_, img) in symbols]
