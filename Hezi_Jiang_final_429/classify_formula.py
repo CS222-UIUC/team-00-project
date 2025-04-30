@@ -11,10 +11,7 @@ def connected_components(image_input, min_area=10):
         img = cv2.imread(image_input, cv2.IMREAD_GRAYSCALE)
     else:
         img = image_input.copy()
-    _, binary = cv2.threshold(
-        img, 0, 255,
-        cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
-    )
+    _, binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
@@ -40,8 +37,7 @@ def connected_components(image_input, min_area=10):
 
 def build_model(num_classes, device):
     model = models.resnet18(pretrained=False)
-    model.conv1 = nn.Conv2d(1, 64, kernel_size=7,
-                            stride=2, padding=3, bias=False)
+    model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     model = model.to(device)
     return model
@@ -56,11 +52,13 @@ def load_model(weights_path, num_classes, device):
 
 
 def preprocess_symbol(sym_img):
-    transform = transforms.Compose([
-        transforms.ToPILImage(),
-        transforms.Resize((28, 28)),
-        transforms.ToTensor(),
-    ])
+    transform = transforms.Compose(
+        [
+            transforms.ToPILImage(),
+            transforms.Resize((28, 28)),
+            transforms.ToTensor(),
+        ]
+    )
     return transform(sym_img)
 
 
@@ -79,13 +77,18 @@ def main():
     parser = argparse.ArgumentParser(
         description="Segment a formula and classify each symbol"
     )
-    parser.add_argument('image', help="path to formula image")
-    parser.add_argument('--model', default='CS222/resnet_handwritten.pth',
-                        help="path to trained weights")
-    parser.add_argument('--classes', default='CS222/classes.json',
-                        help="path to classes.json")
-    parser.add_argument('--min_area', type=int, default=10,
-                        help="minimum CC area to keep")
+    parser.add_argument("image", help="path to formula image")
+    parser.add_argument(
+        "--model",
+        default="CS222/resnet_handwritten.pth",
+        help="path to trained weights",
+    )
+    parser.add_argument(
+        "--classes", default="CS222/classes.json", help="path to classes.json"
+    )
+    parser.add_argument(
+        "--min_area", type=int, default=10, help="minimum CC area to keep"
+    )
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

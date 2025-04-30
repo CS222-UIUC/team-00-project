@@ -10,13 +10,13 @@ from CS222.classify_formula import (
     preprocess_symbol,
     build_model,
     load_model,
-    classify_symbols
+    classify_symbols,
 )
 
 
 def test_main_no_symbols(monkeypatch, tmp_path, capsys):
     blank = np.full((50, 50), 255, dtype=np.uint8)
-    img_path = tmp_path/"blank.png"
+    img_path = tmp_path / "blank.png"
     cv2.imwrite(str(img_path), blank)
     monkeypatch.setattr(sys, "argv", ["clf", str(img_path)])
     main()
@@ -26,7 +26,7 @@ def test_main_no_symbols(monkeypatch, tmp_path, capsys):
 
 def test_connected_components_empty(tmp_path):
     blank = np.full((50, 50), 255, dtype=np.uint8)
-    path = tmp_path/"b.png"
+    path = tmp_path / "b.png"
     cv2.imwrite(str(path), blank)
     assert connected_components(str(path)) == []
 
@@ -34,7 +34,7 @@ def test_connected_components_empty(tmp_path):
 def test_connected_components_simple(tmp_path):
     img = np.full((100, 100), 255, dtype=np.uint8)
     cv2.rectangle(img, (10, 10), (30, 30), 0, -1)
-    path = tmp_path/"s.png"
+    path = tmp_path / "s.png"
     cv2.imwrite(str(path), img)
     comps = connected_components(str(path), min_area=5)
     assert len(comps) == 1
@@ -51,7 +51,7 @@ def test_preprocess_symbol_shape():
 
 def test_build_and_load_model(tmp_path):
     m1 = build_model(num_classes=3, device="cpu")
-    path = tmp_path/"w.pth"
+    path = tmp_path / "w.pth"
     torch.save(m1.state_dict(), str(path))
     m2 = load_model(str(path), num_classes=3, device="cpu")
     assert isinstance(m2, torch.nn.Module)
@@ -59,7 +59,8 @@ def test_build_and_load_model(tmp_path):
 
 class DummyModel(torch.nn.Module):
 
-    def __init__(self): super().__init__()
+    def __init__(self):
+        super().__init__()
 
     def forward(self, x):
         b = x.size(0)
