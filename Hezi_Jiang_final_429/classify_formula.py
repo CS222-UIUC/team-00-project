@@ -4,8 +4,7 @@ import cv2
 import torch
 import torch.nn as nn
 from torchvision import models, transforms
-from PIL import Image
-import numpy as np
+
 
 def connected_components(image_input, min_area=10):
     if isinstance(image_input, str):
@@ -39,7 +38,6 @@ def connected_components(image_input, min_area=10):
     return [img for (_, img) in symbols]
 
 
-
 def build_model(num_classes, device):
     model = models.resnet18(pretrained=False)
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7,
@@ -48,12 +46,14 @@ def build_model(num_classes, device):
     model = model.to(device)
     return model
 
+
 def load_model(weights_path, num_classes, device):
     model = build_model(num_classes, device)
     state = torch.load(weights_path, map_location=device)
     model.load_state_dict(state)
     model.eval()
     return model
+
 
 def preprocess_symbol(sym_img):
     transform = transforms.Compose([
@@ -62,6 +62,7 @@ def preprocess_symbol(sym_img):
         transforms.ToTensor(),
     ])
     return transform(sym_img)
+
 
 def classify_symbols(model, device, class_names, symbols):
     results = []
@@ -72,6 +73,7 @@ def classify_symbols(model, device, class_names, symbols):
             pred = logits.argmax(dim=1).item()
             results.append(class_names[pred])
     return results
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -100,6 +102,7 @@ def main():
     labels = classify_symbols(model, device, class_names, symbols)
 
     print("Recognized:", " ".join(labels))
+
 
 if __name__ == "__main__":
     main()

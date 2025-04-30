@@ -1,9 +1,7 @@
 import sys
-import json
 import torch
 import numpy as np
 import cv2
-import pytest
 
 
 from CS222.classify_formula import (
@@ -17,7 +15,7 @@ from CS222.classify_formula import (
 
 
 def test_main_no_symbols(monkeypatch, tmp_path, capsys):
-    blank = np.full((50,50), 255, dtype=np.uint8)
+    blank = np.full((50, 50), 255, dtype=np.uint8)
     img_path = tmp_path/"blank.png"
     cv2.imwrite(str(img_path), blank)
     monkeypatch.setattr(sys, "argv", ["clf", str(img_path)])
@@ -27,15 +25,15 @@ def test_main_no_symbols(monkeypatch, tmp_path, capsys):
 
 
 def test_connected_components_empty(tmp_path):
-    blank = np.full((50,50), 255, dtype=np.uint8)
+    blank = np.full((50, 50), 255, dtype=np.uint8)
     path = tmp_path/"b.png"
     cv2.imwrite(str(path), blank)
     assert connected_components(str(path)) == []
 
 
 def test_connected_components_simple(tmp_path):
-    img = np.full((100,100), 255, dtype=np.uint8)
-    cv2.rectangle(img, (10,10), (30,30), 0, -1)
+    img = np.full((100, 100), 255, dtype=np.uint8)
+    cv2.rectangle(img, (10, 10), (30, 30), 0, -1)
     path = tmp_path/"s.png"
     cv2.imwrite(str(path), img)
     comps = connected_components(str(path), min_area=5)
@@ -45,10 +43,10 @@ def test_connected_components_simple(tmp_path):
 
 
 def test_preprocess_symbol_shape():
-    dummy = np.zeros((50,50), dtype=np.uint8)
+    dummy = np.zeros((50, 50), dtype=np.uint8)
     t = preprocess_symbol(dummy)
     assert isinstance(t, torch.Tensor)
-    assert t.shape == (1,28,28)
+    assert t.shape == (1, 28, 28)
 
 
 def test_build_and_load_model(tmp_path):
@@ -60,17 +58,17 @@ def test_build_and_load_model(tmp_path):
 
 
 class DummyModel(torch.nn.Module):
-    
+
     def __init__(self): super().__init__()
-    
+
     def forward(self, x):
         b = x.size(0)
         out = torch.zeros(b, 2)
-        out[:,1] = 1.0
+        out[:, 1] = 1.0
         return out
 
 
 def test_classify_symbols_dummy():
-    sym = np.zeros((28,28), dtype=np.uint8)
+    sym = np.zeros((28, 28), dtype=np.uint8)
     labels = classify_symbols(DummyModel(), "cpu", ["zero", "one"], [sym])
     assert labels == ["one"]
