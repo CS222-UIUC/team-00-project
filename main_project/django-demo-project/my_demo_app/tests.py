@@ -225,20 +225,17 @@ class WritepadUITests(StaticLiveServerTestCase):
         super().tearDownClass()
 
     def setUp(self):
-        # create a user & doc
         User = get_user_model()
         self.user = User.objects.create_user("uiuser", "ui@ex.com", "pass123")
         self.document = UserTextData.objects.create(
             user=self.user, name="UI Test Doc", text_data="Start"
         )
 
-        # log in via Selenium
         self.selenium.get(self.live_server_url + reverse("login"))
         self.selenium.find_element(By.NAME, "username").send_keys("uiuser")
         self.selenium.find_element(By.NAME, "password").send_keys("pass123")
         self.selenium.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
 
-        # navigate to the LaTeX editor page
         editor_url = self.live_server_url + reverse(
             "latex_editor", args=[self.document.id]
         )
@@ -280,7 +277,6 @@ class WritepadUITests(StaticLiveServerTestCase):
         """
         )
 
-        # stub out <a> clicks to capture the href
         self.selenium.execute_script(
             """
             window._dlHref = null;
@@ -296,7 +292,6 @@ class WritepadUITests(StaticLiveServerTestCase):
             };
         """
         )
-        # click Download PNG
         self.selenium.find_element(By.ID, "downloadWritepadBtn").click()
 
         href = self.selenium.execute_script("return window._dlHref;")
