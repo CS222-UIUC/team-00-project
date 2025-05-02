@@ -4,8 +4,9 @@ from .models import LoggedInUser, UserTextData
 from django.urls import reverse
 from django.test import RequestFactory
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.options import Options
 
 User = get_user_model()
 
@@ -216,7 +217,9 @@ class WritepadUITests(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.selenium = WebDriver()
+        opts = Options()
+        opts.headless = True
+        cls.selenium = Firefox(options=opts)
         cls.selenium.implicitly_wait(5)
 
     @classmethod
