@@ -1,40 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Main Page</title>
+    <meta charset="UTF-8">
+    <title>Welcome | LaTeX Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        .upside-down {
-            transform: rotate(180deg);
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to right, #ece9e6, #ffffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background-color: white;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            margin-bottom: 1.2rem;
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+        a.button {
+            display: block;
+            margin: 0.5rem 0;
+            padding: 0.6rem 1.2rem;
+            background-color: #4f46e5;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        a.button:hover {
+            background-color: #4338ca;
+        }
+
+        .link-group {
+            margin-top: 1rem;
+        }
+
+        .link-group a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .link-group a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     {% load static %}
-    <h1>Welcome to LaTex converter</h1>
-    <a href="{% url 'login' %}">Login</a>
-    <a href="{% url 'register' %}">Register</a>
-    <h2>Login with OAuth</h2>
-    <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
-    <br><br>
-    <img id="secret-image" src="https://artprojectsforkids.org/wp-content/uploads/2024/01/Draw-Baby-Yoda-web.jpg" alt="Secret Image" style="width:200px;height:auto;">
-    <br><br>
-    <a href="/admin/">Admin</a>
-
-    <audio id="bang-sound" src="{% static 'my_demo_app/smb_stage_clear.wav' %}"></audio>
-
-    <script>
-        let clickCount = 0;
-        const image = document.getElementById('secret-image');
-        const bangSound = document.getElementById('bang-sound');
-
-        image.addEventListener('click', () => {
-            clickCount++;
-            if (clickCount >= 10) {
-                image.classList.add('upside-down');
-                bangSound.play();
-            }
-        });
-    </script>
+    <div class="card">
+        <h1>Welcome to LaTeX Converter</h1>
+        <a href="{% url 'login' %}" class="button">Login</a>
+        <a href="{% url 'register' %}" class="button">Register</a>
+        <a href="{% url 'social:begin' 'google-oauth2' %}" class="button">Login with Google</a>
+        <div class="link-group">
+            <a href="/admin/">Admin</a>
+        </div>
+    </div>
     {% if message %}
     <script>
         alert("{{ message }}");
