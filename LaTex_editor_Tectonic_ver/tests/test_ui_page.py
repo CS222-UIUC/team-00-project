@@ -24,7 +24,7 @@ def test_index_ui_page_contains_form_and_fields(client):
 
 
 def test_full_tectonic_ui_elements(client):
-    resp = client.get('/')
+    resp = client.get("/")
     html = resp.get_data(as_text=True)
 
     assert 'id="main"' in html
@@ -35,12 +35,12 @@ def test_full_tectonic_ui_elements(client):
     assert "<h3>Code</h3>" in html
     assert "<h3>Review</h3>" in html
 
-    assert '>Render<' in html
-    assert '>Copy LaTeX<' in html
-    assert '>Download PDF<' in html
+    assert ">Render<" in html
+    assert ">Copy LaTeX<" in html
+    assert ">Download PDF<" in html
 
     assert 'id="latexInput"' in html
     assert 'id="renderOutput"' in html
     assert 'id="uploadForm"' in html
 
-    assert 'latex.min.js' in html
+    assert "latex.min.js" in html
