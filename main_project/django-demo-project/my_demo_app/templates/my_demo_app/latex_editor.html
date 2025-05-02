@@ -45,7 +45,22 @@
         #writepad {
             background-color: #fee;
             padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
         }
+
+        #writepadCanvas {
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: crosshair;
+        }
+
+        .writepad-controls button {
+            margin-right: 8px;
+            margin-top: 8px;
+        }
+
         .logout-button {
             position: absolute;
             top: 10px;
@@ -96,11 +111,109 @@
 </div>
 
 <div id="writepad">
-    🖋️ <strong>Write Pad</strong> (Coming soon) <button>Insert ➕</button>
+    <h3>Write Pad</h3>
+    <canvas id="writepadCanvas" width="400" height="200"></canvas>
+    <div class="writepad-controls">
+        <button id="clearWritepadBtn">Clear</button>
+        <button id="uploadWritepadBtn">Upload to OCR</button>
+        <button id="downloadWritepadBtn">Download PNG</button>
+    </div>
 </div>
 
 <script>
+window.addEventListener('DOMContentLoaded', () => {
+    // 1) Grab elements
+    const latexInput   = document.getElementById('latexInput');
+    const uploadForm   = document.getElementById('uploadForm');
+    const photoInput   = document.getElementById('photoInput');
+    const canvas       = document.getElementById('writepadCanvas');
+    const clearBtn     = document.getElementById('clearWritepadBtn');
+    const uploadPadBtn = document.getElementById('uploadWritepadBtn');
+    const downloadBtn  = document.getElementById('downloadWritepadBtn');
+    const renderOutput = document.getElementById('renderOutput');
+
+    // 2) Shared cursor state
     let latexCursor = { start: 0, end: 0 };
+    function saveCursor() {
+        latexCursor.start = latexInput.selectionStart;
+        latexCursor.end   = latexInput.selectionEnd;
+    }
+    latexInput.addEventListener('click', saveCursor);
+    latexInput.addEventListener('keyup',  saveCursor);
+    latexInput.addEventListener('focus', saveCursor);
+
+    // 3) Photo-upload → OCR → insert
+    uploadForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        saveCursor();
+        if (!photoInput.files.length) return alert('Select an image');
+        const fd = new FormData();
+        fd.append('image', photoInput.files[0]);
+        try {
+        const res  = await fetch("http://127.0.0.1:5050/ocr", { method: 'POST', body: fd });
+        const data = await res.json();
+        if (res.ok && data.latex) insertAtCursor(data.latex);
+        else alert('OCR failed: ' + (data.error||'Unknown'));
+        } catch(err) {
+        console.error(err);
+        alert('Error uploading image');
+        }
+    });
+
+    // 4) Write-pad logic
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup',   () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mouseout',  () => drawing = false);
+    canvas.addEventListener('mousemove', e => {
+        if (!drawing) return;
+        const r = canvas.getBoundingClientRect();
+        ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+        ctx.lineTo(e.clientX - r.left, e.clientY - r.top);
+        ctx.stroke(); ctx.beginPath(); ctx.moveTo(e.clientX - r.left, e.clientY - r.top);
+    });
+
+    clearBtn.addEventListener('click', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+    });
+
+    downloadBtn.addEventListener('click', () => {
+        const url = canvas.toDataURL('image/png');
+        const a   = document.createElement('a');
+        a.href    = url; a.download = 'writepad.png'; a.click();
+    });
+
+    uploadPadBtn.addEventListener('click', () => {
+        canvas.toBlob(async blob => {
+        const fd = new FormData();
+        fd.append('image', blob, 'writepad.png');
+        try {
+            const res  = await fetch("http://127.0.0.1:5050/ocr", { method: 'POST', body: fd });
+            const data = await res.json();
+            if (res.ok && data.latex) insertAtCursor(data.latex);
+            else alert('OCR failed: ' + (data.error||'Unknown'));
+        } catch (err) {
+            console.error(err);
+            alert('Error uploading writepad');
+        }
+        });
+    });
+
+    // ─── Insert-At-Cursor helper ───
+    function insertAtCursor(latex) {
+        saveCursor();
+        const wrapped = '$$' + latex + '$$';
+        const before  = latexInput.value.slice(0, latexCursor.start);
+        const after   = latexInput.value.slice(latexCursor.end);
+        latexInput.value = before + wrapped + after;
+        const pos = latexCursor.start + wrapped.length;
+        latexInput.selectionStart = latexInput.selectionEnd = pos;
+        latexInput.focus();
+        renderLatex();
+    }
+
     function renderLatex(retry = false) {
         const input = document.getElementById("latexInput").value;
         fetch("http://127.0.0.1:5050/compile", {
@@ -165,173 +278,64 @@
         URL.revokeObjectURL(url);
     }
 
-    // Image Upload Integration
-    document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+    function saveDocument() {
+        const content = document.getElementById("latexInput").value;
+        const currentName = "{{ document.name }}";
+        const currentId = "{{ document.id }}";
+        const newName = prompt("Enter document name:", currentName);
 
-    const fileInput = document.getElementById("photoInput");
-    if (fileInput.files.length === 0) return alert("Please select an image");
+        if (!newName) return alert("❗ Document name is required to save.");
 
-    const formData = new FormData();
-    formData.append("image", fileInput.files[0]);
-
-    latexCursor.start = latexInput.selectionStart;
-    latexCursor.end = latexInput.selectionEnd;
-
-    try {
-        const ocrResponse = await fetch("http://127.0.0.1:5050/ocr", {
+        fetch("", {
             method: "POST",
-            body: formData
-        });
-
-        const ocrText = await ocrResponse.text();
-        let ocrData = {};
-
-        try {
-            ocrData = JSON.parse(ocrText);
-        } catch (err) {
-            console.error("Invalid JSON from OCR:", ocrText);
-            alert("OCR response is not valid JSON.");
-            return;
-        }
-
-        if (ocrResponse.ok && ocrData.latex) {
-            const original = latexInput.value;
-            latexInput.value = original.slice(0, latexCursor.start) + ocrData.latex + original.slice(latexCursor.end);
-
-            const cursorPosition = latexCursor.start + ocrData.latex.length;
-            latexInput.selectionStart = latexInput.selectionEnd = cursorPosition;
-            latexCursor.start = latexCursor.end = cursorPosition;
-
-            renderLatex();
-            latexInput.focus();
-        } else {
-            alert("OCR failed: " + (ocrData.error || "Unknown error"));
-        }
-
-    } catch (err) {
-        alert("Error: " + err.message);
-        console.error(err);
-    }
-});
-window.onload = function () {
-    // Track LaTeX editor cursor
-    let latexCursor = { start: 0, end: 0 };
-    const latexInput = document.getElementById("latexInput");
-    function saveCursor() {
-        latexCursor.start = latexInput.selectionStart;
-        latexCursor.end = latexInput.selectionEnd;
-    }
-
-    latexInput.addEventListener("keyup", saveCursor);
-    latexInput.addEventListener("click", saveCursor);
-    latexInput.addEventListener("focus", saveCursor);
-    renderLatex();
-    // CLI listener
-    document.getElementById("cliInput").addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-            const input = this.value.trim();
-            if (!input) return;
-
-            const history = document.getElementById("cliHistory");
-            const entry = document.createElement("div");
-            entry.textContent = ">> " + input;
-            history.appendChild(entry);
-            history.scrollTop = history.scrollHeight;
-
-            fetch("http://127.0.0.1:7000/latex", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: input })
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: new URLSearchParams({
+                content,
+                name: newName
             })
-            .then(res => res.json())
-            .then(data => {
-                const out = document.createElement("div");
-                out.textContent = data.latex || "⚠️ No LaTeX";
-                history.appendChild(out);
-                history.scrollTop = history.scrollHeight;
-
-                if (data.latex) {
-                    const original = latexInput.value;
-
-                    latexInput.value = original.slice(0, latexCursor.start) + data.latex + original.slice(latexCursor.end);
-
-                    const cursorPosition = latexCursor.start + data.latex.length;
-                    latexInput.selectionStart = latexInput.selectionEnd = cursorPosition;
-                    latexCursor.start = latexCursor.end = cursorPosition;
-
-                    renderLatex();
-                    latexInput.focus();
-                }
-            })
-            .catch(err => {
-                const errMsg = document.createElement("div");
-                errMsg.textContent = "⚠️ Error: " + err.message;
-                errMsg.style.color = "#f55";
-                history.appendChild(errMsg);
-                history.scrollTop = history.scrollHeight;
-            });
-
-            this.value = "";
-        }
-    });
-
-};
-function saveDocument() {
-    const content = document.getElementById("latexInput").value;
-    const currentName = "{{ document.name }}";
-    const currentId = "{{ document.id }}";
-    const newName = prompt("Enter document name:", currentName);
-
-    if (!newName) return alert("❗ Document name is required to save.");
-
-    fetch("", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-CSRFToken": getCookie("csrftoken")
-        },
-        body: new URLSearchParams({
-            content,
-            name: newName
         })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.error) {
-            alert("❌ " + data.error);
-        } else {
-            alert("✅ Document saved as: " + data.doc_name);
-            if (data.doc_id !== currentId) {
-                window.location.href = `/documents/${data.doc_id}/`;
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert("❌ " + data.error);
+            } else {
+                alert("✅ Document saved as: " + data.doc_name);
+                if (data.doc_id !== currentId) {
+                    window.location.href = `/documents/${data.doc_id}/`;
+                }
             }
-        }
-    })
-    .catch(err => {
-        alert("❌ Save failed: " + err.message);
-    });
-}
-
-
-
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-        const cookies = document.cookie.split(";");
-        for (let cookie of cookies) {
-            cookie = cookie.trim();
-            if (cookie.startsWith(name + "=")) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+        })
+        .catch(err => {
+            alert("❌ Save failed: " + err.message);
+        });
     }
-    return cookieValue;
-}
 
-
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    window.renderLatex    = renderLatex;
+    window.insertAtCursor = insertAtCursor;
+    window.downloadPDF    = downloadPDF;
+    window.copyLatex      = copyLatex;
+    window.saveDocument   = saveDocument;
+    renderLatex();
+});
 </script>
+
 <div id="cliBox" style="position: fixed; bottom: 10px; right: 10px; width: 320px; background: #111; color: #0f0; font-family: monospace; padding: 10px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 999;">
     <div style="margin-bottom: 6px;">🧮 <strong>AI Helper</strong>
         <button onclick="document.getElementById('cliBox').style.display='none'" style="float:right; font-size:12px;">×</button>
