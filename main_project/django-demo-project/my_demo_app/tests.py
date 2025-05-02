@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.test import RequestFactory
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.webdriver.common.by import By
 
 User = get_user_model()
 
@@ -224,13 +225,79 @@ class WritepadUITests(StaticLiveServerTestCase):
         super().tearDownClass()
 
     def setUp(self):
-        from django.contrib.auth import get_user_model
-        from my_demo_app.models import UserTextData
+        # create a user & doc
         User = get_user_model()
-        self.user = User.objects.create_user('uiuser', 'ui@ex.com', 'pass123')
-        self.client.login(username='uiuser', password='pass123')
+        self.user = User.objects.create_user("uiuser", "ui@ex.com", "pass123")
         self.document = UserTextData.objects.create(
-            user=self.user,
-            name="UI Test Doc",
-            text_data="Start"
+            user=self.user, name="UI Test Doc", text_data="Start"
         )
+
+        # log in via Selenium
+        self.selenium.get(self.live_server_url + reverse("login"))
+        self.selenium.find_element(By.NAME, "username").send_keys("uiuser")
+        self.selenium.find_element(By.NAME, "password").send_keys("pass123")
+        self.selenium.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
+
+        # navigate to the LaTeX editor page
+        editor_url = self.live_server_url + reverse(
+            "latex_editor", args=[self.document.id]
+        )
+        self.selenium.get(editor_url)
+
+    def test_clear_writepad(self):
+        # draw a little square on the canvas via JS
+        self.selenium.execute_script(
+            """
+            const c = document.getElementById('writepadCanvas');
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0,0,5,5);
+        """
+        )
+        # capture the dataURL
+        before = self.selenium.execute_script(
+            "return document.getElementById('writepadCanvas').toDataURL();"
+        )
+        self.assertTrue(before.startswith("data:image/png"))
+
+        # click Clear
+        self.selenium.find_element(By.ID, "clearWritepadBtn").click()
+
+        after = self.selenium.execute_script(
+            "return document.getElementById('writepadCanvas').toDataURL();"
+        )
+        # after should differ from before (canvas is now blank)
+        self.assertNotEqual(after, before)
+
+    def test_download_writepad(self):
+        # draw again
+        self.selenium.execute_script(
+            """
+            const c = document.getElementById('writepadCanvas');
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0,0,5,5);
+        """
+        )
+
+        # stub out <a> clicks to capture the href
+        self.selenium.execute_script(
+            """
+            window._dlHref = null;
+            const orig = document.createElement.bind(document);
+            document.createElement = function(tag) {
+                const el = orig(tag);
+                if (tag === 'a') {
+                    Object.defineProperty(el, 'click', {
+                        value: function() { window._dlHref = el.href; }
+                    });
+                }
+                return el;
+            };
+        """
+        )
+        # click Download PNG
+        self.selenium.find_element(By.ID, "downloadWritepadBtn").click()
+
+        href = self.selenium.execute_script("return window._dlHref;")
+        self.assertTrue(href and href.startswith("data:image/png"))
