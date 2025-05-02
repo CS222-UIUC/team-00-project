@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from .models import LoggedInUser, UserTextData
 from django.urls import reverse
 from django.test import RequestFactory
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 User = get_user_model()
 
@@ -207,3 +209,28 @@ class LatexEditorViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("Name already in use", response.json()["error"])
+
+
+class WritepadUITests(StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.selenium = WebDriver()
+        cls.selenium.implicitly_wait(5)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super().tearDownClass()
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        from my_demo_app.models import UserTextData
+        User = get_user_model()
+        self.user = User.objects.create_user('uiuser', 'ui@ex.com', 'pass123')
+        self.client.login(username='uiuser', password='pass123')
+        self.document = UserTextData.objects.create(
+            user=self.user,
+            name="UI Test Doc",
+            text_data="Start"
+        )
