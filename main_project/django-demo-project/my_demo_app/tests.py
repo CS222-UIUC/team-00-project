@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from .models import LoggedInUser, UserTextData
 from django.urls import reverse
 from django.test import RequestFactory
+
 # from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 # from selenium.webdriver.common.by import By
 # from selenium.webdriver import Firefox
@@ -297,6 +298,7 @@ class LatexEditorViewTests(TestCase):
 #         )
 #         self.selenium.find_element(By.ID, "downloadWritepadBtn").click()
 
+
 #         href = self.selenium.execute_script("return window._dlHref;")
 #         self.assertTrue(href and href.startswith("data:image/png"))
 class WritepadTemplateTests(TestCase):
@@ -304,9 +306,7 @@ class WritepadTemplateTests(TestCase):
         self.user = User.objects.create_user(username="wpuser", password="testpass")
         self.client.login(username="wpuser", password="testpass")
         self.doc = UserTextData.objects.create(
-            user=self.user,
-            name="Writepad Doc",
-            text_data="Some content"
+            user=self.user, name="Writepad Doc", text_data="Some content"
         )
 
     def test_writepad_canvas_is_present(self):
@@ -317,11 +317,11 @@ class WritepadTemplateTests(TestCase):
     def test_clear_button_exists(self):
         resp = self.client.get(reverse("latex_editor", args=[self.doc.id]))
         self.assertContains(resp, 'id="clearWritepadBtn"')
-        self.assertContains(resp, '>Clear<')
+        self.assertContains(resp, ">Clear<")
 
     def test_download_and_upload_buttons_exist(self):
         resp = self.client.get(reverse("latex_editor", args=[self.doc.id]))
         self.assertContains(resp, 'id="downloadWritepadBtn"')
-        self.assertContains(resp, '>Download PNG<')
+        self.assertContains(resp, ">Download PNG<")
         self.assertContains(resp, 'id="uploadWritepadBtn"')
-        self.assertContains(resp, '>Upload to OCR<')
+        self.assertContains(resp, ">Upload to OCR<")
