@@ -10,6 +10,10 @@ set /p CONDA_ACTIVATE=Enter full path to activate.bat (e.g., E:\Documents\anacon
 REM Remove surrounding quotes if user added them
 set CONDA_ACTIVATE=%CONDA_ACTIVATE:"=%
 
+REM Start FastAPI server for OCR (server.py)
+cd /d %~dp0\Final_Handwritting_Recognizer_Model
+start cmd /k call "%CONDA_ACTIVATE%" %CONDA_ENV% ^&^& uvicorn server:app --reload --port 7950
+
 REM Start LLM server
 cd /d %~dp0\LaTex_Online_editor\LLM_MODEL
 start cmd /k call "%CONDA_ACTIVATE%" %CONDA_ENV% ^&^& python -m uvicorn api_server:app --reload --port 7000
