@@ -1,0 +1,6 @@
+setup.py
+handwriting_recognizer.egg-info/PKG-INFO
+handwriting_recognizer.egg-info/SOURCES.txt
+handwriting_recognizer.egg-info/dependency_links.txt
+handwriting_recognizer.egg-info/requires.txt
+handwriting_recognizer.egg-info/top_level.txt

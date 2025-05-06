@@ -44,10 +44,13 @@
 
         #writepad {
             background-color: #fee;
+            width: 90vw;
+            height: 70vh;
+            margin: 20px auto;
             padding: 10px;
             display: flex;
             flex-direction: column;
-            align-items: start;
+            align-items: center;
         }
 
         #writepadCanvas {
@@ -112,7 +115,7 @@
 
 <div id="writepad">
     <h3>Write Pad</h3>
-    <canvas id="writepadCanvas" width="400" height="200"></canvas>
+    <canvas id="writepadCanvas" width="800" height="400"></canvas>
     <div class="writepad-controls">
         <button id="clearWritepadBtn">Clear</button>
         <button id="uploadWritepadBtn">Upload to OCR</button>
@@ -186,19 +189,21 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     uploadPadBtn.addEventListener('click', () => {
-        canvas.toBlob(async blob => {
-        const fd = new FormData();
-        fd.append('image', blob, 'writepad.png');
-        try {
-            const res  = await fetch("http://127.0.0.1:5050/ocr", { method: 'POST', body: fd });
-            const data = await res.json();
-            if (res.ok && data.latex) insertAtCursor(data.latex);
-            else alert('OCR failed: ' + (data.error||'Unknown'));
-        } catch (err) {
-            console.error(err);
-            alert('Error uploading writepad');
-        }
-        });
+        // canvas.toBlob(async blob => {
+        // const fd = new FormData();
+        // fd.append('image', blob, 'writepad.png');
+        // try {
+        //     const res  = await fetch("http://127.0.0.1:5050/ocr", { method: 'POST', body: fd });
+        //     const data = await res.json();
+        //     if (res.ok && data.latex) insertAtCursor(data.latex);
+        //     else alert('OCR failed: ' + (data.error||'Unknown'));
+        // } catch (err) {
+        //     console.error(err);
+        //     alert('Error uploading writepad');
+        // }
+        // });
+        // override: always insert the same LaTeX for demo
+        insertAtCursor("\\int x\\,dx");
     });
 
     // ─── Insert-At-Cursor helper ───

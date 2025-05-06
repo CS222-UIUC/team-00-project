@@ -1,19 +1,16 @@
 import tempfile
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, send_file, jsonify, after_this_request
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-from backend.ocr import predictor
-from PIL import Image
 import uuid
 import os
 import subprocess
-from flask import after_this_request
 from backend.ocr import predict_latex
 
 app = Flask(__name__)
 CORS(app)
 
-UPLOAD_FOLDER = "math_formulas"
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "math_formulas")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
@@ -85,6 +82,6 @@ def index_ui():
 
 
 if __name__ == "__main__":  # pragma: no cover
-    dummy = Image.new("RGB", (10, 10), color="white")
-    _ = predictor([dummy])
-    app.run(host="127.0.0.1", port=5050, debug=True)
+    # dummy = Image.new("RGB", (10, 10), color="white")
+    # _ = predictor([dummy])
+    app.run(host="127.0.0.1", port=5050, debug=True, use_reloader=False)
