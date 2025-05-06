@@ -7,7 +7,9 @@ import sys
 from classify_formula import connected_components, load_model, classify_symbols
 
 MODEL_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "Final_Handwritting_Recognizer_Model")
+    os.path.join(
+        os.path.dirname(__file__), "..", "..", "Final_Handwritting_Recognizer_Model"
+    )
 )
 if MODEL_DIR not in sys.path:
     sys.path.insert(0, MODEL_DIR)

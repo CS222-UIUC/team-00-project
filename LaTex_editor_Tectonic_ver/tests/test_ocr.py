@@ -6,7 +6,9 @@ from unittest.mock import patch
 
 def test_predict_latex_dummy():
     dummy_path = "tests/assets/formula_sample.png"
-    assert os.path.exists(dummy_path), "Make sure tests/assets/formula_sample.png exists"
+    assert os.path.exists(
+        dummy_path
+    ), "Make sure tests/assets/formula_sample.png exists"
     latex = predict_latex(dummy_path)
     assert isinstance(latex, str)
     assert len(latex) > 0
