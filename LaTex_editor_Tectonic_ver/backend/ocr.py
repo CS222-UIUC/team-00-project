@@ -1,35 +1,40 @@
-from PIL import Image
-from surya.texify import TexifyPredictor
-import re
+import os
+import cv2
+import torch
+import json
+import sys
 
-predictor = TexifyPredictor()
+from classify_formula import connected_components, load_model, classify_symbols
+
+MODEL_DIR = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__), "..", "..", "Final_Handwritting_Recognizer_Model"
+    )
+)
+if MODEL_DIR not in sys.path:
+    sys.path.insert(0, MODEL_DIR)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+class_path = os.path.join(MODEL_DIR, "classes.json")
+model_path = os.path.join(MODEL_DIR, "resnet_handwritten.pth")
+
+with open(class_path, "r") as f:
+    class_names = json.load(f)
+
+_model = load_model(model_path, len(class_names), device)
 
 
 def predict_latex(image_path):
-    try:
-        image = Image.open(image_path)
-    except Exception as e:
-        raise ValueError(f"Failed to load image: {e}")
-    if image is None:
-        raise ValueError("Image is None — could not be loaded")
+    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    if img is None:
+        raise ValueError(f"Could not load image '{image_path}'")
 
-    prediction = predictor([image])
-    if prediction and len(prediction) > 0:
-        return extract_latex(str(prediction[0]))
-    return ""
+    symbols = connected_components(img, min_area=10)
+    if not symbols:
+        return ""
 
-
-def extract_latex(text):
-    if text.startswith("text="):
-        text = text[len("text=") :].strip()
-    if "confidence=" in text:
-        text = text.split("confidence=")[0].strip()
-    if len(text) >= 2 and text[0] in ['"', "'"] and text[-1] in ['"', "'"]:
-        text = text[1:-1]
-    if text.startswith("<math"):
-        text = re.sub(r"<math[^>]*>", "", text)
-        text = text.replace("</math>", "")
-    return text.strip()
+    labels = classify_symbols(_model, device, class_names, symbols)
+    return "".join(labels)
 
 
 def wrap_latex(latex_body):

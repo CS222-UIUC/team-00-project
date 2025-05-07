@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: handwriting_recognizer
+Version: 0.1.0
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: torch
+Requires-Dist: opencv-python
+Requires-Dist: numpy
