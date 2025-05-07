@@ -145,6 +145,55 @@ window.addEventListener('DOMContentLoaded', () => {
     latexInput.addEventListener('keyup',  saveCursor);
     latexInput.addEventListener('focus', saveCursor);
 
+        // CLI listener
+        document.getElementById("cliInput").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            const input = this.value.trim();
+            if (!input) return;
+
+            const history = document.getElementById("cliHistory");
+            const entry = document.createElement("div");
+            entry.textContent = ">> " + input;
+            history.appendChild(entry);
+            history.scrollTop = history.scrollHeight;
+
+            fetch("http://127.0.0.1:7000/latex", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: input })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const out = document.createElement("div");
+                out.textContent = data.latex || "⚠️ No LaTeX";
+                history.appendChild(out);
+                history.scrollTop = history.scrollHeight;
+
+                if (data.latex) {
+                    const original = latexInput.value;
+
+                    latexInput.value = original.slice(0, latexCursor.start) + data.latex + original.slice(latexCursor.end);
+
+                    const cursorPosition = latexCursor.start + data.latex.length;
+                    latexInput.selectionStart = latexInput.selectionEnd = cursorPosition;
+                    latexCursor.start = latexCursor.end = cursorPosition;
+
+                    renderLatex();
+                    latexInput.focus();
+                }
+            })
+            .catch(err => {
+                const errMsg = document.createElement("div");
+                errMsg.textContent = "⚠️ Error: " + err.message;
+                errMsg.style.color = "#f55";
+                history.appendChild(errMsg);
+                history.scrollTop = history.scrollHeight;
+            });
+
+            this.value = "";
+        }
+    });
+
     // 3) Photo-upload → OCR → insert
     uploadForm.addEventListener('submit', async e => {
         e.preventDefault();
