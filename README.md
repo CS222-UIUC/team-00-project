@@ -18,6 +18,8 @@ See more details in: [proposal](https://docs.google.com/document/d/1Ipx34Mwvf48k
 
 ## Technical Architecture
 
+![Technical Architecture](https://github.com/user-attachments/assets/c52569b5-3924-49cc-818f-13c505c43c45)
+
 ## Environment Setup
 
 ### Clone the Repository
