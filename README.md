@@ -44,7 +44,6 @@ pip install -r requirements.txt
 # For Linux/MacOS users
 ./start_servers.sh
 ```
-
 ## Group Members and Their Roles
 
 Hezi Jiang: Develop Handwriting Recognition AI model, including finding data, comparing efficiency of different models, training Restnet model, and combining Connected Component with Restnet.
