@@ -6,19 +6,16 @@ The AI-Powered LaTeX Editor is a fully open-sourced, privacy-focused tool design
 
 It includes the following features:
 
-Natural Language to LaTeX: Powered by fine-tuned LLMs , your plain English is instantly translated into LaTeX.
-
-Handwriting Recognition: Upload math photos or write directly — our ResNet-based recognizer turns it into clean LaTeX.
-
-Tectonic-Based Rendering: Generates PDF previews on the fly using a self-contained LaTeX engine.
-
-Document Management: Create and edit multiple LaTeX documents linked to your account.
+- **Natural Language to LaTeX**: Powered by fine-tuned LLMs, your plain English is instantly translated into LaTeX.
+- **Handwriting Recognition**: Upload math photos or write directly — our ResNet-based recognizer turns it into clean LaTeX.
+- **Tectonic-Based Rendering**: Generates PDF previews on the fly using a self-contained LaTeX engine.
+- **Document Management**: Create and edit multiple LaTeX documents linked to your account.
 
 See more details in: [proposal](https://docs.google.com/document/d/1Ipx34Mwvf48kuJAU6oV9qhhJl3--2rnNl3wdk8bEcwY/edit?tab=t.0#heading=h.qougbnz1fcec)
 
 ## Technical Architecture
 
-![Technical Architecture](https://github.com/user-attachments/assets/79e68924-e711-4b9f-a45c-43f77d8daa55)
+![Technical Architecture](images/technical_architecture.png)
 
 ## Environment Setup
 
