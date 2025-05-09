@@ -1,39 +1,8 @@
 # Team 0 Project – Spring 2025
 
-## Introduction
+## Getting Started
 
-The AI-Powered LaTeX Editor is a fully open-sourced, privacy-focused tool designed to streamline LaTeX editing for students in technical fields. It runs locally and supports natural language, handwriting, and image-based inputs through AI. The editor provides a modern UI, real-time preview, and fast PDF rendering — all without needing cloud access or subscriptions.
-
-It includes the following features:
-
-Natural Language to LaTeX: Powered by fine-tuned LLMs , your plain English is instantly translated into LaTeX.
-
-Handwriting Recognition: Upload math photos or write directly — our ResNet-based recognizer turns it into clean LaTeX.
-
-Tectonic-Based Rendering: Generates PDF previews on the fly using a self-contained LaTeX engine.
-
-Document Management: Create and edit multiple LaTeX documents linked to your account.
-
-## Technical Architecture
-
-![Technical Architecture](images/technical_architecture.png)
-
-## Environment Setup
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/CS222-UIUC/team-00-project.git
-cd team-00-project
-```
-
-### Initial Environment Installation
-
-```bash
-pip install -r requirements.txt
-```
-
-### Start the Application
+Use the appropriate script to start the servers:
 
 ```bash
 # For Windows users
