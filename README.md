@@ -16,7 +16,7 @@ Document Management: Create and edit multiple LaTeX documents linked to your acc
 
 ## Technical Architecture
 
-![Alt Text](Technical Architecture.png)
+![Technical Architecture](https://github.com/user-attachments/assets/79e68924-e711-4b9f-a45c-43f77d8daa55)
 
 ## Environment Setup
 
