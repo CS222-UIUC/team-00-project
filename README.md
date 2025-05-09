@@ -16,7 +16,7 @@ Document Management: Create and edit multiple LaTeX documents linked to your acc
 
 ## Technical Architecture
 
-![Alt Text](Technical Architecture.png)
+![Technical Architecture](images/technical_architecture.png)
 
 ## Environment Setup
 
