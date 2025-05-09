@@ -44,6 +44,8 @@ pip install -r requirements.txt
 # For Linux/MacOS users
 ./start_servers.sh
 ```
+Please access localhost/8000 port for interactive UI when servers are successfully started.
+
 ## Group Members and Their Roles
 
 Hezi Jiang: Develop Handwriting Recognition AI model, including finding data, comparing efficiency of different models, training Restnet model, and combining Connected Component with Restnet.
