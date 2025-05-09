@@ -14,6 +14,8 @@ Tectonic-Based Rendering: Generates PDF previews on the fly using a self-contain
 
 Document Management: Create and edit multiple LaTeX documents linked to your account.
 
+See more details in: [proposal](https://docs.google.com/document/d/1Ipx34Mwvf48kuJAU6oV9qhhJl3--2rnNl3wdk8bEcwY/edit?tab=t.0#heading=h.qougbnz1fcec)
+
 ## Technical Architecture
 
 ![Technical Architecture](https://github.com/user-attachments/assets/79e68924-e711-4b9f-a45c-43f77d8daa55)
