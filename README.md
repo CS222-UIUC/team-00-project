@@ -16,7 +16,7 @@ Document Management: Create and edit multiple LaTeX documents linked to your acc
 
 ## Technical Architecture
 
-![Technical Architecture](https://github.com/user-attachments/assets/2eaa82e6-ba62-472e-ba68-697a5372a9e2)
+![Technical Architecture](images/technical_architecture.png)
 
 ## Environment Setup
 
@@ -42,11 +42,3 @@ pip install -r requirements.txt
 # For Linux/MacOS users
 ./start_servers.sh
 ```
-
-## Group Members and Their Roles
-
-Hezi Jiang: Develop Handwriting Recognition AI model, including finding data, comparing efficiency of different models, training Restnet model, and combining Connected Component with Restnet.
-
-Kexin Hu:Develop DJANGO & SQLITE, Develop Document List, Develop LaTex Editor, Develop Tectonic LaTeX Renderer
-
-Xinyang Li: Develop DJANGO & SQLITE, design the Login Page, Develop Document List, Develop LaTex Editor, Develop LLM AI Helper
